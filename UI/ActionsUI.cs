@@ -6,6 +6,7 @@ using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
 using RTS_LEARN.Units;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace RTS_LEARN.UI
 {
@@ -19,11 +20,18 @@ namespace RTS_LEARN.UI
             Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
 
+
+        }
+
+        private void Start()
+        //wait for the UI to be ready
+        {
             foreach (UIActionButton button in actionButtons)
             {
-                button.SetIcon(null);
+                button.Disable();
             }
         }
+
         private void OnDestroy()
         {
             Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
@@ -61,19 +69,22 @@ namespace RTS_LEARN.UI
 
             for (int i = 0; i < actionButtons.Length; i++)
             {
-                // if (i < availableCommands.Count)
-                // {
-                    ActionBase actionForSlot = availableCommands.Where(action => action.Slot == i).FirstOrDefault();
-                    if (actionForSlot != null)
-                    {
-                        actionButtons[i].SetIcon(actionForSlot.Icon);
-                    }
-                    else
-                    {
-                        actionButtons[i].SetIcon(null);
-                    }
-                // }
+                ActionBase actionForSlot = availableCommands.Where(action => action.Slot == i).FirstOrDefault();
+                if (actionForSlot != null)
+                {
+                    actionButtons[i].EnableFor(actionForSlot, HandleClick(actionForSlot));
+                    Debug.Log($"Enabling button for action: {actionForSlot.name} in slot {i}");
+                }
+                else
+                {
+                    actionButtons[i].Disable();
+                }
             }
+        }
+
+        private UnityAction HandleClick(ActionBase Action)
+        {
+            return () => Bus<ActionSelectedEvent>.Raise(new ActionSelectedEvent(Action));
         }
     }
 }

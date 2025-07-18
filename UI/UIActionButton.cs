@@ -1,23 +1,50 @@
 
+using RTS_LEARN.Commands;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class UIActionButton : MonoBehaviour
+namespace RTS_LEARN.UI
 {
-    [SerializeField] private Image icon;
-
-    public void SetIcon(Sprite icon)
+    [RequireComponent(typeof(Button))]//force to add If not present
+    public class UIActionButton : MonoBehaviour
     {
-        if (icon == null)
-        {
-            this.icon.enabled = false;
+        [SerializeField] private Image icon;
 
-        }
-        else
+        private Button button;
+
+        private void Awake()
         {
-            this.icon.sprite = icon;
-            this.icon.enabled = true;
+            button = GetComponent<Button>();
         }
 
+        public void EnableFor(ActionBase action, UnityAction onClick)
+        {
+            SetIcon(action.Icon);
+            button.interactable = true;
+            button.onClick.AddListener(onClick);
+        }
+
+        public void Disable()
+        {
+            SetIcon(null);
+            button.interactable = false;
+            button.onClick.RemoveAllListeners();
+        }
+
+        private void SetIcon(Sprite icon)
+        {
+            if (icon == null)
+            {
+                this.icon.enabled = false;
+
+            }
+            else
+            {
+                this.icon.sprite = icon;
+                this.icon.enabled = true;
+            }
+
+        }
     }
 }

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RTS_LEARN.Commands;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
 using RTS_LEARN.Units;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 
@@ -25,6 +27,8 @@ namespace RTS_LEARN.Player
 
         private Vector2 startingMousePosition;
 
+        private ActionBase activeAction;
+        private bool wasMouseDownOnUI;
         private CinemachineFollow cinemachineFollow;
         private float zoomStartTime;
         private Vector3 startingFollowOffset;
@@ -52,21 +56,22 @@ namespace RTS_LEARN.Player
             Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
             Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
-            Bus<UnitRemoveEvent>.OnEvent += HandleUnitRemoved;
+            // Bus<UnitRemoveEvent>.OnEvent += HandleUnitRemoved;
+            Bus<ActionSelectedEvent>.OnEvent += HandleActionSelected;
         }
 
         private void HandleUnitSpawned(UnitSpawnEvent evt) => aliveUnits.Add(evt.Unit);
-        private void HandleUnitRemoved(UnitRemoveEvent evt) => aliveUnits.Remove(evt.Unit);
+        // private void HandleUnitRemoved(UnitRemoveEvent evt) => aliveUnits.Remove(evt.Unit);
         private void HandleUnitSelected(UnitSelectedEvent evt) => selectedUnits.Add(evt.Unit);
         private void HandleUnitDeselected(UnitDeselectedEvent evt) => selectedUnits.Remove(evt.Unit);
-
+        private void HandleActionSelected(ActionSelectedEvent evt) => activeAction = evt.Action;
         private void OnDestroy()
         {   //subscribe to events
             Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
             Bus<UnitSpawnEvent>.OnEvent -= HandleUnitSpawned;
-            Bus<UnitRemoveEvent>.OnEvent -= HandleUnitRemoved;
-
+            // Bus<UnitRemoveEvent>.OnEvent -= HandleUnitRemoved;
+            Bus<ActionSelectedEvent>.OnEvent -= HandleActionSelected;
         }
 
         void Update()
@@ -75,11 +80,11 @@ namespace RTS_LEARN.Player
             HandleZooming();
             HandlePanning();
             HandleRightClick();
-            HandleDragSelect();
+            HandleDragSelectByLeft();
         }
 
 
-        private void HandleDragSelect()
+        private void HandleDragSelectByLeft()
         {
             if (selectionBox == null) { return; }
 
@@ -99,7 +104,7 @@ namespace RTS_LEARN.Player
 
         private void HandleMouseUp()
         {
-            if (!Keyboard.current.shiftKey.isPressed)
+            if (activeAction == null && !Keyboard.current.shiftKey.isPressed)
             {
                 DeselectAllUnits();
             }
@@ -114,6 +119,11 @@ namespace RTS_LEARN.Player
 
         private void HandleMouseDrag()
         {
+            if (activeAction != null || wasMouseDownOnUI)
+            {
+                return; // Ignore drag if an action is active or mouse was down on UI
+            }
+
             Bounds selectionBounds = ResizeSelectionBox();
             foreach (AbstractUnit unit in aliveUnits)
             {
@@ -133,6 +143,7 @@ namespace RTS_LEARN.Player
             startingMousePosition = Mouse.current.position.ReadValue();
             selectionBox.gameObject.SetActive(true);
             addedUnits.Clear();
+            wasMouseDownOnUI = EventSystem.current.IsPointerOverGameObject();
         }
 
         private void DeselectAllUnits()
@@ -203,11 +214,29 @@ namespace RTS_LEARN.Player
             if (camera == null) { return; }
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-            if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue /* infinitely long */,
-            /*LayerMask.GetMask("Default")*/
-            selectableUnitsLayers) && hit.collider.TryGetComponent(out ISelectable selectable))
+            if (activeAction == null
+                && Physics.Raycast(ray, out RaycastHit hit, float.MaxValue
+                /* infinitely long */, /*LayerMask.GetMask("Default")*/ selectableUnitsLayers)
+                && hit.collider.TryGetComponent(out ISelectable selectable))
             {
                 selectable.Select();
+            }
+            else if (activeAction != null
+                && !EventSystem.current.IsPointerOverGameObject()
+                && Physics.Raycast(ray, out hit, float.MaxValue, floorLayers))
+            {
+                List<AbstractUnit> abstractUnits = selectedUnits
+                    .Where((unit) => unit is AbstractUnit)
+                    .Cast<AbstractUnit>()
+                    .ToList();
+
+                for (int i = 0; i < abstractUnits.Count; i++)
+                {
+                    CommandContext context = new(abstractUnits[i], hit, i);
+                    activeAction.Handle(context);
+                }
+
+                activeAction = null; // Reset active action after handling
             }
 
         }
