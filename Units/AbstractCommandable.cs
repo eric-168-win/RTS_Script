@@ -1,4 +1,6 @@
+using System;
 using System.Windows.Input;
+using RTS_LEARN.Commands;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
 using UnityEngine;
@@ -10,7 +12,7 @@ namespace RTS_LEARN.Units
     {
         [field: SerializeField] public int CurrentHealth { get; private set; }
         [field: SerializeField] public int MaxHealth { get; private set; }
-        [field: SerializeField] public ICommand[] AvailableCommands { get; private set; }
+        [field: SerializeField] public ActionBase[] AvailableCommands { get; private set; }
 
         [SerializeField] private DecalProjector decalProjector;
         [SerializeField] private UnitSO UnitSO;

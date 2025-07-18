@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using RTS_LEARN.Commands;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
 using RTS_LEARN.Units;
@@ -188,8 +189,19 @@ namespace RTS_LEARN.Player
                     int maxUnitsOnLayer = 1; // Example limit, adjust as needed
                     float circleRadius = 0; // Example radius, adjust as needed
                     float radiusOffset = 0; // Example offset, adjust as needed
+
+
                     foreach (AbstractUnit unit in AbstractUnits)
                     {
+
+                        foreach (ICommand command in unit.AvailableCommands)
+                        {
+                            if (command.CanHandle(unit, hit))
+                            {
+                                command.Handle(unit, hit);
+                            }
+                        }
+
                         Vector3 targetPosition = new(
                             hit.point.x + circleRadius * Mathf.Cos(radiusOffset * unitsOnLayer),
                             hit.point.y,

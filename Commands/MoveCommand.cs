@@ -3,17 +3,20 @@ using UnityEngine;
 
 namespace RTS_LEARN.Commands
 {
-    public class MoveCommand : ScriptableObject, ICommand
+    [CreateAssetMenu(fileName = "Move Action", menuName = "AI/Actions/Move", order = 100)]
+    public class MoveCommand : ActionBase
     {
-        public bool CanHandle(AbstractCommandable commandable, RaycastHit hit)
+        public override bool CanHandle(AbstractCommandable commandable, RaycastHit hit)
         {
-            throw new System.NotImplementedException();
+            return commandable is IMoveable;
         }
 
-        public void Handle(AbstractCommandable commandable, RaycastHit hit)
+        public override void Handle(AbstractCommandable commandable, RaycastHit hit)
         {
-            throw new System.NotImplementedException();
+            IMoveable moveable = (IMoveable)commandable;
+            moveable.MoveTo(hit.point);
         }
+
 
     }
 }
