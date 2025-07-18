@@ -1,0 +1,409 @@
+using System;
+using System.Collections.Generic;
+using RTS_LEARN.Event;
+using RTS_LEARN.EventBus;
+using RTS_LEARN.Units;
+using Unity.Cinemachine;
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+
+namespace RTS_LEARN.Player
+{
+    public class PlayerInput : MonoBehaviour
+    {
+        [SerializeField] private Rigidbody cameraTarget;
+        [SerializeField] private CinemachineCamera cinemachineCamera;
+        [SerializeField] private new Camera camera;
+        [SerializeField] private CameraConfig cameraConfig;
+        [SerializeField] private LayerMask selectableUnitsLayers;
+        [SerializeField] private LayerMask floorLayers;
+
+        [SerializeField] private RectTransform selectionBox; // UI element for selection box
+
+
+        private Vector2 startingMousePosition;
+
+        private CinemachineFollow cinemachineFollow;
+        private float zoomStartTime;
+        private Vector3 startingFollowOffset;
+
+        private float rotationStartTime;
+        private float maxRotationAmount;
+
+        private HashSet<AbstractUnit> aliveUnits = new(100);
+        private HashSet<AbstractUnit> addedUnits = new(24);
+        private List<ISelectable> selectedUnits = new(12);//keep the list Constant, don't want to resize it (resize is computationally expensive)
+
+
+        private void Awake()
+        {
+
+            // cinemachineFollow = cinemachineCamera.GetComponent<CinemachineFollow>();
+            if (!cinemachineCamera.TryGetComponent(out cinemachineFollow))
+            {
+                Debug.LogError("CinemachineFollow component not found on CinemachineCamera.");
+            }
+            startingFollowOffset = cinemachineFollow.FollowOffset;
+
+            maxRotationAmount = Mathf.Abs(cinemachineFollow.FollowOffset.z);
+
+            Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
+            Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
+            Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
+            Bus<UnitRemoveEvent>.OnEvent += HandleUnitRemoved;
+        }
+
+        private void HandleUnitSpawned(UnitSpawnEvent evt) => aliveUnits.Add(evt.Unit);
+        private void HandleUnitRemoved(UnitRemoveEvent evt) => aliveUnits.Remove(evt.Unit);
+        private void HandleUnitSelected(UnitSelectedEvent evt) => selectedUnits.Add(evt.Unit);
+        private void HandleUnitDeselected(UnitDeselectedEvent evt) => selectedUnits.Remove(evt.Unit);
+
+        private void OnDestroy()
+        {   //subscribe to events
+            Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
+            Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
+            Bus<UnitSpawnEvent>.OnEvent -= HandleUnitSpawned;
+            Bus<UnitRemoveEvent>.OnEvent -= HandleUnitRemoved;
+
+        }
+
+        void Update()
+        {
+            HandleRotation();
+            HandleZooming();
+            HandlePanning();
+            HandleRightClick();
+            HandleDragSelect();
+
+            // Debug.Log("selectedUnits.Count === " + selectedUnits.Count);
+
+        }
+
+
+        private void HandleDragSelect()
+        {
+            if (selectionBox == null) { return; }
+
+            if (Mouse.current.leftButton.wasPressedThisFrame)
+            {
+                HandleMouseDown();
+            }
+            else if (Mouse.current.leftButton.isPressed && !Mouse.current.leftButton.wasReleasedThisFrame)
+            {
+                HandleMouseDrag();
+            }
+            else if (Mouse.current.leftButton.wasReleasedThisFrame)
+            {
+                HandleMouseUp();
+            }
+        }
+
+        private void HandleMouseUp()
+        {
+            if (!Keyboard.current.shiftKey.isPressed)
+            {
+                DeselectAllUnits();
+            }
+            HandleLeftClick();
+            foreach (AbstractUnit unit in addedUnits)
+            {
+                unit.Select();
+            }
+            // Disable UIF
+            selectionBox.gameObject.SetActive(false);
+        }
+
+        private void HandleMouseDrag()
+        {
+            Bounds selectionBounds = ResizeSelectionBox();
+            foreach (AbstractUnit unit in aliveUnits)
+            {
+                Vector2 unitPosition = camera.WorldToScreenPoint(unit.transform.position);
+                //WorldToScreenPoint converts world position to screen position
+                if (selectionBounds.Contains(unitPosition))
+                {
+                    addedUnits.Add(unit);
+                }
+            }
+        }
+
+        private void HandleMouseDown()
+        {
+            // Enable the UI
+            selectionBox.sizeDelta = Vector2.zero;
+            startingMousePosition = Mouse.current.position.ReadValue();
+            selectionBox.gameObject.SetActive(true);
+            addedUnits.Clear();
+        }
+
+        private void DeselectAllUnits()
+        {
+            Debug.Log("DeselectAllUnits called");
+            ISelectable[] currentSelectedUnits = selectedUnits.ToArray();
+            foreach (ISelectable selectable in currentSelectedUnits)
+            {
+                selectable.Deselect();
+            }
+            selectedUnits.Clear();
+        }
+
+        private Bounds ResizeSelectionBox()
+        {
+            Vector2 currentMousePosition = Mouse.current.position.ReadValue();
+
+            float width = currentMousePosition.x - startingMousePosition.x;
+            float height = currentMousePosition.y - startingMousePosition.y;
+            Vector2 selectionBoxSize = currentMousePosition - startingMousePosition;
+
+            selectionBox.anchoredPosition = startingMousePosition + selectionBoxSize / 2;
+            selectionBox.sizeDelta = new Vector2(Mathf.Abs(width), Mathf.Abs(height));
+
+            return new Bounds(
+                selectionBox.anchoredPosition,
+                selectionBox.sizeDelta
+            );
+        }
+
+        private void HandleRightClick()
+        {
+            if (selectedUnits.Count == 0) { return; }
+
+            if (Mouse.current.rightButton.wasReleasedThisFrame)
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+                if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, floorLayers))
+                {
+                    List<AbstractUnit> AbstractUnits = new List<AbstractUnit>(selectedUnits.Count);
+                    foreach (ISelectable selectable in selectedUnits)
+                    {
+                        if (selectable is AbstractUnit unit)
+                        {
+                            AbstractUnits.Add(unit);
+                        }
+                    }
+
+                    int unitsOnLayer = 0;
+                    int maxUnitsOnLayer = 1; // Example limit, adjust as needed
+                    float circleRadius = 0; // Example radius, adjust as needed
+                    float radiusOffset = 0; // Example offset, adjust as needed
+                    foreach (AbstractUnit unit in AbstractUnits)
+                    {
+                        Vector3 targetPosition = new(
+                            hit.point.x + circleRadius * Mathf.Cos(radiusOffset * unitsOnLayer),
+                            hit.point.y,
+                            hit.point.z + circleRadius * Mathf.Sin(radiusOffset * unitsOnLayer)
+                        );
+                        unit.MoveTo(targetPosition);
+                        unitsOnLayer++;
+                        // radiusOffset += 2 * Mathf.PI / maxUnitsOnLayer; // Adjust the radial offset for the next unit
+
+                        if (unitsOnLayer >= maxUnitsOnLayer)
+                        {
+                            unitsOnLayer = 0; // Reset the counter for the next layer
+                            circleRadius += unit.AgentRadius * 3.5f; // Increase the radius for the next layer
+                            maxUnitsOnLayer = Mathf.FloorToInt(2 * Mathf.PI * circleRadius / (unit.AgentRadius * 2)); // Increase the max units on the next layer
+                            radiusOffset += 2 * Mathf.PI / maxUnitsOnLayer; // Adjust the radial offset for the next layer
+                        }
+
+
+                    }
+
+
+
+                    // foreach (ISelectable selectable in selectedUnits)
+                    // {
+                    //     if (selectable is IMoveable moveable)
+                    //     {
+                    //         moveable.MoveTo(hit.point);
+                    //     }
+                    // }
+                }
+            }
+        }
+
+        private void HandleLeftClick()
+        {
+            if (camera == null) { return; }
+            Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+            if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue /* infinitely long */,
+            /*LayerMask.GetMask("Default")*/
+            selectableUnitsLayers) && hit.collider.TryGetComponent(out ISelectable selectable))
+            {
+                selectable.Select();
+            }
+
+        }
+
+        private void HandlePanning()
+        {
+            Vector2 moveAmount = GetKeyboardMovement();
+            moveAmount += GetMouseMovement();
+            // cameraTarget(Transform) insead of using Rigidbody
+            // moveAmount *= Time.deltaTime;
+            // cameraTarget.position += new Vector3(moveAmount.x, 0, moveAmount.y);
+
+            cameraTarget.linearVelocity = new Vector3(moveAmount.x, 0, moveAmount.y);
+        }
+
+        private Vector2 GetMouseMovement()
+        {
+            Vector2 moveAmount = Vector2.zero;
+
+            if (cameraConfig.EnableEdgePan)
+            {
+                Vector2 mousePosition = Mouse.current.position.ReadValue();
+                Vector2 screenSize = new Vector2(Screen.width, Screen.height);
+
+                if (mousePosition.x <= cameraConfig.EdgePanSize)
+                {
+                    moveAmount.x -= cameraConfig.MousePanSpeed;
+                }
+                else if (mousePosition.x > screenSize.x - cameraConfig.EdgePanSize)
+                {
+                    moveAmount.x += cameraConfig.MousePanSpeed;
+                }
+
+                if (mousePosition.y <= cameraConfig.EdgePanSize)
+                {
+                    moveAmount.y -= cameraConfig.MousePanSpeed;
+                }
+                else if (mousePosition.y > screenSize.y - cameraConfig.EdgePanSize)
+                {
+                    moveAmount.y += cameraConfig.MousePanSpeed;
+                }
+            }
+
+            return moveAmount;
+        }
+
+        private Vector2 GetKeyboardMovement()
+        {
+            Vector2 moveAmount = Vector2.zero;
+
+            if (Keyboard.current.upArrowKey.isPressed)
+            {
+                moveAmount.y += cameraConfig.KeyboardPanSpeed;
+            }
+            if (Keyboard.current.leftArrowKey.isPressed)
+            {
+                moveAmount.x -= cameraConfig.KeyboardPanSpeed;
+            }
+            if (Keyboard.current.downArrowKey.isPressed)
+            {
+                moveAmount.y -= cameraConfig.KeyboardPanSpeed;
+            }
+            if (Keyboard.current.rightArrowKey.isPressed)
+            {
+                moveAmount.x += cameraConfig.KeyboardPanSpeed;
+            }
+
+            return moveAmount;
+        }
+
+        private void HandleZooming()
+        {
+            if (ShouldSetZoomStartTime())
+            {
+                zoomStartTime = Time.time;
+                // Debug.Log("Zoom start time set: " + zoomStartTime);
+            }
+
+
+            float zoomTime = Mathf.Clamp01((Time.time - zoomStartTime) * cameraConfig.ZoomSpeed);
+            Vector3 targetFollowOffset;
+
+            if (Keyboard.current.endKey.isPressed)
+            {
+                targetFollowOffset = new Vector3(
+                    cinemachineFollow.FollowOffset.x,
+                    cameraConfig.MinZoomDistance,
+                    cinemachineFollow.FollowOffset.z
+                );
+
+                // cinemachineFollow.FollowOffset = Vector3.Slerp(
+                //     startingFollowOffset,
+                //     targetFollowOffset,
+                //     zoomTime
+                // );
+            }
+            else
+            {
+                // cinemachineFollow.FollowOffset = Vector3.Slerp(
+                //     targetFollowOffset,
+                //     startingFollowOffset,
+                //     zoomTime
+                // );
+
+                targetFollowOffset = new Vector3(
+                    cinemachineFollow.FollowOffset.x,
+                    startingFollowOffset.y,
+                    cinemachineFollow.FollowOffset.z
+                );
+            }
+
+            cinemachineFollow.FollowOffset = Vector3.Slerp(
+                   cinemachineFollow.FollowOffset,
+                   targetFollowOffset,
+                   zoomTime
+            );
+        }
+
+        private bool ShouldSetZoomStartTime()
+        {
+            return Keyboard.current.endKey.wasPressedThisFrame
+            || Keyboard.current.endKey.wasReleasedThisFrame;
+        }
+
+        private bool ShouldSetRotationStartTime()
+        {
+            return Keyboard.current.pageUpKey.wasPressedThisFrame
+            || Keyboard.current.pageDownKey.wasPressedThisFrame
+            || Keyboard.current.pageUpKey.wasReleasedThisFrame
+            || Keyboard.current.pageDownKey.wasReleasedThisFrame
+            ;
+        }
+
+        private void HandleRotation()
+        {
+            if (ShouldSetRotationStartTime())
+            {
+                rotationStartTime = Time.time;
+                // Debug.Log("Rotation start time set: " + rotationStartTime);
+            }
+
+            float rotationAmount = Mathf.Clamp01((Time.time - rotationStartTime) * cameraConfig.RotationSpeed);
+
+            Vector3 targetFollowOffset;
+
+            if (Keyboard.current.pageDownKey.isPressed)
+            {
+                targetFollowOffset = new Vector3(
+                    maxRotationAmount, cinemachineFollow.FollowOffset.y, 0);
+            }
+            else if (Keyboard.current.pageUpKey.isPressed)
+            {
+                targetFollowOffset = new Vector3(
+                    -maxRotationAmount, cinemachineFollow.FollowOffset.y, 0);
+
+            }
+            else
+            {
+                targetFollowOffset = new Vector3(
+                    startingFollowOffset.x,
+                    cinemachineFollow.FollowOffset.y,
+                    startingFollowOffset.z
+                );
+            }
+
+            cinemachineFollow.FollowOffset = Vector3.Slerp(
+                 cinemachineFollow.FollowOffset,
+                 targetFollowOffset,
+                 rotationAmount
+             );
+
+        }
+    }
+}
