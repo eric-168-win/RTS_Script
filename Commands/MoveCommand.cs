@@ -6,6 +6,7 @@ namespace RTS_LEARN.Commands
     [CreateAssetMenu(fileName = "Move Action", menuName = "AI/Actions/Move", order = 100)]
     public class MoveCommand : ActionBase
     {
+        [SerializeField] private float radiusMultiplied = 3.5f;
         private int unitsOnLayer = 0;
         private int maxUnitsOnLayer = 1; // Example limit, adjust as needed
         private float circleRadius = 0; // Example radius, adjust as needed
@@ -41,7 +42,7 @@ namespace RTS_LEARN.Commands
             if (unitsOnLayer >= maxUnitsOnLayer)
             {
                 unitsOnLayer = 0; // Reset the counter for the next layer
-                circleRadius += unit.AgentRadius * 3.5f; // Increase the radius for the next layer
+                circleRadius += unit.AgentRadius * radiusMultiplied; // Increase the radius for the next layer
                 maxUnitsOnLayer = Mathf.FloorToInt(2 * Mathf.PI * circleRadius / (unit.AgentRadius * 2)); // Increase the max units on the next layer
                 radiusOffset += 2 * Mathf.PI / maxUnitsOnLayer; // Adjust the radial offset for the next layer
             }

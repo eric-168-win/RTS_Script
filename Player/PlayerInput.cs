@@ -76,9 +76,6 @@ namespace RTS_LEARN.Player
             HandlePanning();
             HandleRightClick();
             HandleDragSelect();
-
-            // Debug.Log("selectedUnits.Count === " + selectedUnits.Count);
-
         }
 
 
@@ -111,7 +108,7 @@ namespace RTS_LEARN.Player
             {
                 unit.Select();
             }
-            // Disable UIF
+            // Disable UI
             selectionBox.gameObject.SetActive(false);
         }
 
