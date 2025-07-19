@@ -113,7 +113,9 @@ namespace RTS_LEARN.Player
 
         private void HandleMouseUp()
         {
-            if (activeAction == null && !Keyboard.current.shiftKey.isPressed)
+            if (!wasMouseDownOnUI
+                && activeAction == null
+                && !Keyboard.current.shiftKey.isPressed)
             {
                 DeselectAllUnits();
             }
