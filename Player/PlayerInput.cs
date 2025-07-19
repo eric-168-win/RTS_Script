@@ -64,7 +64,16 @@ namespace RTS_LEARN.Player
         // private void HandleUnitRemoved(UnitRemoveEvent evt) => aliveUnits.Remove(evt.Unit);
         private void HandleUnitSelected(UnitSelectedEvent evt) => selectedUnits.Add(evt.Unit);
         private void HandleUnitDeselected(UnitDeselectedEvent evt) => selectedUnits.Remove(evt.Unit);
-        private void HandleActionSelected(ActionSelectedEvent evt) => activeAction = evt.Action;
+        private void HandleActionSelected(ActionSelectedEvent evt)
+        {
+            activeAction = evt.Action;
+            if (!activeAction.RequiresClickToActivate)
+            {
+                ActivateAction(new RaycastHit());
+            }
+        }
+
+
         private void OnDestroy()
         {   //subscribe to events
             Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
@@ -225,20 +234,25 @@ namespace RTS_LEARN.Player
                 && !EventSystem.current.IsPointerOverGameObject()
                 && Physics.Raycast(ray, out hit, float.MaxValue, floorLayers))
             {
-                List<AbstractUnit> abstractUnits = selectedUnits
-                    .Where((unit) => unit is AbstractUnit)
-                    .Cast<AbstractUnit>()
-                    .ToList();
-
-                for (int i = 0; i < abstractUnits.Count; i++)
-                {
-                    CommandContext context = new(abstractUnits[i], hit, i);
-                    activeAction.Handle(context);
-                }
-
-                activeAction = null; // Reset active action after handling
+                ActivateAction(hit);
             }
 
+        }
+
+        private void ActivateAction(RaycastHit hit)
+        {
+            List<AbstractCommandable> absCmdables = selectedUnits
+                .Where((unit) => unit is AbstractCommandable)
+                .Cast<AbstractCommandable>()
+                .ToList();
+
+            for (int i = 0; i < absCmdables.Count; i++)
+            {
+                CommandContext context = new(absCmdables[i], hit, i);
+                activeAction.Handle(context);
+            }
+
+            activeAction = null; // Reset active action after handling
         }
 
         private void HandlePanning()
