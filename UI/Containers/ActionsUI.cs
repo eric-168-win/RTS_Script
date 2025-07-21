@@ -4,25 +4,16 @@ using System.Linq;
 using RTS_LEARN.Commands;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
+using RTS_LEARN.UI.Components;
 using RTS_LEARN.Units;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace RTS_LEARN.UI
+namespace RTS_LEARN.UI.Containers
 {
-
-    public class ActionsUI : MonoBehaviour
+    public class ActionsUI : MonoBehaviour, IUIElement<HashSet<AbstractCommandable>>
     {
         [SerializeField] private UIActionButton[] actionButtons;
-        private HashSet<AbstractCommandable> selectedUnits = new(12);
-        private void Awake()
-        {
-            Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
-            Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
-
-
-        }
-
         private void Start()
         //wait for the UI to be ready
         {
@@ -32,33 +23,20 @@ namespace RTS_LEARN.UI
             }
         }
 
-        private void OnDestroy()
+        public void EnableFor(HashSet<AbstractCommandable> selectedUnits)
         {
-            Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
-            Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
+            RefreshButtons(selectedUnits);
         }
 
-        private void HandleUnitSelected(UnitSelectedEvent evt)
+        public void Disable()
         {
-            if (evt.Unit is AbstractCommandable commandable)
+            foreach (UIActionButton actionButton in actionButtons)
             {
-                selectedUnits.Add(commandable);
-                RefreshButtons();
-            }
-
-        }
-
-        private void HandleUnitDeselected(UnitDeselectedEvent evt)
-        {
-            if (evt.Unit is AbstractCommandable commandable)
-            {
-                selectedUnits.Remove(commandable);
-                RefreshButtons();
-
+                actionButton.Disable();
             }
         }
 
-        private void RefreshButtons()
+        private void RefreshButtons(HashSet<AbstractCommandable> selectedUnits)
         {
             HashSet<ActionBase> availableCommands = new(9);
 
@@ -86,5 +64,6 @@ namespace RTS_LEARN.UI
         {
             return () => Bus<ActionSelectedEvent>.Raise(new ActionSelectedEvent(Action));
         }
+
     }
 }

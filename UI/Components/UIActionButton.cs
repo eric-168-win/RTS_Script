@@ -4,10 +4,10 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-namespace RTS_LEARN.UI
+namespace RTS_LEARN.UI.Components
 {
     [RequireComponent(typeof(Button))]//force to add If not present
-    public class UIActionButton : MonoBehaviour
+    public class UIActionButton : MonoBehaviour, IUIElement<ActionBase, UnityAction>
     {
         [SerializeField] private Image icon;
 
@@ -37,7 +37,6 @@ namespace RTS_LEARN.UI
             if (icon == null)
             {
                 this.icon.enabled = false;
-
             }
             else
             {

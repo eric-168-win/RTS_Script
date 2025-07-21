@@ -159,7 +159,7 @@ namespace RTS_LEARN.Player
 
         private void DeselectAllUnits()
         {
-            Debug.Log("DeselectAllUnits called");
+            // Debug.Log("DeselectAllUnits called");
             ISelectable[] currentSelectedUnits = selectedUnits.ToArray();
             foreach (ISelectable selectable in currentSelectedUnits)
             {
