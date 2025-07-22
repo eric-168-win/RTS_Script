@@ -9,44 +9,48 @@ namespace RTS_LEARN.Units
 {
     public class BaseBuilding : AbstractCommandable
     {
-        private Queue<UnitSO> buildingQueue = new(MAX_QUEUE_SIZE);
+        public int QueueSize => buildingQueue.Count;
+        [field: SerializeField] public float CurrentQueueStartTime { get; private set; }
+        [field: SerializeField] public UnitSO BuildingUnit { get; private set; }
 
+        public delegate void QueueUpdatedEvent(UnitSO[] unitsInQueue);
+        public event QueueUpdatedEvent OnQueueUpdated;
+
+        private Queue<UnitSO> buildingQueue = new(MAX_QUEUE_SIZE);
         private const int MAX_QUEUE_SIZE = 5;
+
         public void BuildUnit(UnitSO unit)
         {
             if (buildingQueue.Count == MAX_QUEUE_SIZE)
-            {
-                Debug.Log("buildingQueue is now full! This is not supported!!");
                 return;
-            }
 
             buildingQueue.Enqueue(unit);
             if (buildingQueue.Count == 1)
             {
                 StartCoroutine(DoBuildUnit());
             }
-
-
-
+            else
+            {
+                OnQueueUpdated?.Invoke(buildingQueue.ToArray());
+            }
         }
 
         private IEnumerator DoBuildUnit()
         {
             while (buildingQueue.Count > 0)
             {
-                UnitSO unit = buildingQueue.Peek();
-                Debug.Log("start the coroutine!");
-                yield return new WaitForSeconds(unit.BuildTime);
-                Debug.Log("build time has elapsed! instantiating the unit!");
-                Instantiate(unit.Prefab, transform.position, Quaternion.identity);
+                BuildingUnit = buildingQueue.Peek();
+                CurrentQueueStartTime = Time.time;
+                OnQueueUpdated?.Invoke(buildingQueue.ToArray());
+
+                yield return new WaitForSeconds(BuildingUnit.BuildTime);
+
+                Instantiate(BuildingUnit.Prefab, transform.position, Quaternion.identity);
                 buildingQueue.Dequeue();
             }
-
+            OnQueueUpdated?.Invoke(buildingQueue.ToArray());
         }
-
-
     }
-
 }
 
 

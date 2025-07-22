@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
 using RTS_LEARN.UI.Containers;
@@ -12,6 +13,8 @@ namespace RTS_LEARN.UI
     public class RuntimeUI : MonoBehaviour
     {
         [SerializeField] private ActionsUI actionsUI;
+        [SerializeField] private BuildingBuildingUI buildingBuildingUI;
+
         HashSet<AbstractCommandable> selectedUnits = new(12);
 
 
@@ -19,6 +22,12 @@ namespace RTS_LEARN.UI
         {
             Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
+        }
+
+        void Start()
+        {
+            actionsUI.Disable();
+            buildingBuildingUI.Disable();
         }
 
         void OnDestroy()
@@ -31,9 +40,13 @@ namespace RTS_LEARN.UI
         {
             if (evt.Unit is AbstractCommandable commandable)
             {
-                Debug.Log("HandleUnitSelected:::" + commandable.MaxHealth);
                 selectedUnits.Add(commandable);
                 actionsUI.EnableFor(selectedUnits);
+            }
+
+            if (selectedUnits.Count == 1 && evt.Unit is BaseBuilding building)
+            {
+                buildingBuildingUI.EnableFor(building);
             }
         }
         private void HandleUnitDeselected(UnitDeselectedEvent evt)
@@ -44,20 +57,26 @@ namespace RTS_LEARN.UI
                 if (selectedUnits.Count > 0)
                 {
                     actionsUI.EnableFor(selectedUnits);
+                    if (selectedUnits.Count == 1 && selectedUnits.First() is BaseBuilding building)
+                    {
+                        buildingBuildingUI.EnableFor(building);
+                    }
+                    else
+                    {
+                        buildingBuildingUI.Disable();
+                    }
                 }
                 else
                 {
                     actionsUI.Disable();
+                    buildingBuildingUI.Disable();
                 }
             }
 
         }
 
         // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
-        {
 
-        }
 
         // Update is called once per frame
         void Update()
