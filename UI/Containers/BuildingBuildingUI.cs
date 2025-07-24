@@ -46,6 +46,10 @@ namespace RTS_LEARN.UI.Containers
             {
                 StartCoroutine(UpdateUnitProgress());
             }
+            else if (unitsInQueue.Length == 0)
+            {
+                progressBar.SetProgress(0);
+            }
             SetupUnitButtons();
         }
 
