@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using RTS_LEARN.UI.Components;
 using RTS_LEARN.Units;
 using UnityEngine;
@@ -9,27 +7,37 @@ namespace RTS_LEARN.UI.Containers
 {
     public class BuildingBuildingUI : MonoBehaviour, IUIElement<BaseBuilding>
     {
-
-        private Queue<UnitSO> buildingQueue = new(MAX_QUEUE_SIZE);
-        public float CurrentQueueStartTime { get; private set; }
-        private const int MAX_QUEUE_SIZE = 5;
+        [SerializeField] private UIBuildQueueButton[] unitButtons;
         [SerializeField] private ProgressBar progressBar;
 
         private Coroutine buildCoroutine;
         private BaseBuilding building;
 
-        void Awake()
-        {
-
-        }
-
         public void EnableFor(BaseBuilding item)
         {
+            progressBar.SetProgress(0);
             gameObject.SetActive(true);
             building = item;
             building.OnQueueUpdated += HandleQueueUpdated;
+            SetupUnitButtons();
 
             buildCoroutine = StartCoroutine(UpdateUnitProgress());
+        }
+
+        private void SetupUnitButtons()
+        {
+            int i = 0;
+            for (; i < building.QueueSize; i++)
+            {
+                int index = i;
+                // unitButtons[i].EnableFor(building.Queue[i], CancelThatBuilding(index));
+                // unitButtons[i].EnableFor(building.Queue[i], () => building.CancelBuildingUnit(i)); //i is not correct
+                unitButtons[i].EnableFor(building.Queue[i], () => building.CancelBuildingUnit(index));
+            }
+            for (; i < unitButtons.Length; i++)
+            {
+                unitButtons[i].Disable();
+            }
         }
 
         private void HandleQueueUpdated(UnitSO[] unitsInQueue)
@@ -38,13 +46,14 @@ namespace RTS_LEARN.UI.Containers
             {
                 StartCoroutine(UpdateUnitProgress());
             }
+            SetupUnitButtons();
         }
 
         public void Disable()
         {
             if (building != null)
             {
-                building.OnQueueUpdated += HandleQueueUpdated;
+                building.OnQueueUpdated -= HandleQueueUpdated;
             }
 
             gameObject.SetActive(false);
@@ -64,6 +73,8 @@ namespace RTS_LEARN.UI.Containers
                 progressBar.SetProgress(progress);
                 yield return null;
             }
+
+            buildCoroutine = null;
         }
     }
 }
