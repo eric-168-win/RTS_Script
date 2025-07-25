@@ -25,18 +25,22 @@ namespace RTS_LEARN.Units
         {
             base.Start();
             Bus<UnitSpawnEvent>.Raise(new UnitSpawnEvent(this));
-            MoveTo(transform.position);
+            graphAgent.SetVariableValue("Command", UnitCommands.Stop);
+
         }
 
         public void MoveTo(Vector3 position)
         {
             // agent.SetDestination(position);
             graphAgent.SetVariableValue("TargetLocation", position);
+            graphAgent.SetVariableValue("Command", UnitCommands.Move);//will abort current execution => place after TargetLocation
+
         }
 
-        public void StopMoving()
+        public void Stop()
         {
-            throw new System.NotImplementedException();
+            // graphAgent.SetVariableValue("TargetLocation", transform.position);
+            graphAgent.SetVariableValue("Command", UnitCommands.Stop);
         }
 
     }
