@@ -7,6 +7,8 @@ namespace RTS_LEARN.Units
     public enum UnitCommands
     {
         Stop,
-        Move
+        Move,
+
+        Gather
     }
 }

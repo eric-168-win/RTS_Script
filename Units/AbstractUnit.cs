@@ -13,7 +13,7 @@ namespace RTS_LEARN.Units
         public float AgentRadius => agent.radius; //meaning only Getter// expression bodied property
         private NavMeshAgent agent;
 
-        private BehaviorGraphAgent graphAgent;
+        protected BehaviorGraphAgent graphAgent;
 
 
         void Awake()

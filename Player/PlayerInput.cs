@@ -20,6 +20,7 @@ namespace RTS_LEARN.Player
         [SerializeField] private new Camera camera;
         [SerializeField] private CameraConfig cameraConfig;
         [SerializeField] private LayerMask selectableUnitsLayers;
+        [SerializeField] private LayerMask interactableUnitsLayers;
         [SerializeField] private LayerMask floorLayers;
 
         [SerializeField] private RectTransform selectionBox; // UI element for selection box
@@ -193,7 +194,7 @@ namespace RTS_LEARN.Player
             {
                 Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-                if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, floorLayers))
+                if (Physics.Raycast(ray, out RaycastHit hit, float.MaxValue, interactableUnitsLayers | floorLayers))
                 {
                     List<AbstractUnit> abstractUnits = new(selectedUnits.Count);
                     foreach (ISelectable selectable in selectedUnits)
@@ -234,7 +235,7 @@ namespace RTS_LEARN.Player
             }
             else if (activeAction != null
                 && !EventSystem.current.IsPointerOverGameObject()
-                && Physics.Raycast(ray, out hit, float.MaxValue, floorLayers))
+                && Physics.Raycast(ray, out hit, float.MaxValue, interactableUnitsLayers | floorLayers))
             {
                 ActivateAction(hit);
             }
@@ -251,7 +252,10 @@ namespace RTS_LEARN.Player
             for (int i = 0; i < absCmdables.Count; i++)
             {
                 CommandContext context = new(absCmdables[i], hit, i);
-                activeAction.Handle(context);
+                if (activeAction.CanHandle(context))
+                {
+                    activeAction.Handle(context);
+                }
             }
 
             activeAction = null; // Reset active action after handling
