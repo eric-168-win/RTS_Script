@@ -18,16 +18,16 @@ namespace RTS_LEARN.Behavior
 
         protected override Status OnStart()
         {
-            Debug.Log("MoveToTargetGameObjectAction started");
+            // Debug.Log("MoveToTargetGameObjectAction started");
             if (!Agent.Value.TryGetComponent(out agent))
             {
-                Debug.Log("000000aaaaa");
                 return Status.Failure;
             }
-            Vector3 targetPosition = TargetGameObject.Value.transform.position;
+
+            Vector3 targetPosition = GetTargetPosition();
+
             if (Vector3.Distance(agent.transform.position, targetPosition) <= agent.stoppingDistance)
             {
-                Debug.Log("111111eeeee");
                 return Status.Success;
             }
 
@@ -35,16 +35,28 @@ namespace RTS_LEARN.Behavior
             return Status.Running;
         }
 
+        private Vector3 GetTargetPosition()
+        {
+            Vector3 a;
+            if (TargetGameObject.Value.TryGetComponent(out Collider collider))
+            {
+                a = collider.ClosestPoint(agent.transform.position);
+            }
+            else
+            {
+                a = TargetGameObject.Value.transform.position;
+            }
+            return a;
+        }
+
         protected override Status OnUpdate()
         {
             if (agent.remainingDistance <= agent.stoppingDistance)
             {
-                Debug.Log("CCCCCaaaa");
                 return Status.Success;
             }
             return Status.Running;
         }
 
     }
-
 }
