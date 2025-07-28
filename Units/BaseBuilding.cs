@@ -24,7 +24,7 @@ namespace RTS_LEARN.Units
                 return;
 
             buildingQueue.Add(unit);
-            Debug.Log("BBB:::QueueSize::  " + QueueSize);
+            // Debug.Log("BBB:::QueueSize::  " + QueueSize);
             if (buildingQueue.Count == 1)
             {
                 StartCoroutine(DoBuildUnit());

@@ -51,7 +51,7 @@ namespace RTS_LEARN.UI.Containers
                 if (actionForSlot != null)
                 {
                     actionButtons[i].EnableFor(actionForSlot, HandleClick(actionForSlot));
-                    Debug.Log($"Enabling button for action: {actionForSlot.name} in slot {i}");
+                    // Debug.Log($"Enabling button for action: {actionForSlot.name} in slot {i}");
                 }
                 else
                 {
