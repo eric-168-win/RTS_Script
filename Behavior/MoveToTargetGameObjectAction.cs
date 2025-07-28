@@ -37,16 +37,16 @@ namespace RTS_LEARN.Behavior
 
         private Vector3 GetTargetPosition()
         {
-            Vector3 a;
+            Vector3 obj;
             if (TargetGameObject.Value.TryGetComponent(out Collider collider))
             {
-                a = collider.ClosestPoint(agent.transform.position);
+                obj = collider.ClosestPoint(agent.transform.position);
             }
             else
             {
-                a = TargetGameObject.Value.transform.position;
+                obj = TargetGameObject.Value.transform.position;
             }
-            return a;
+            return obj;
         }
 
         protected override Status OnUpdate()
