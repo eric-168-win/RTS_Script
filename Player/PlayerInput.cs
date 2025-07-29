@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using RTS_LEARN.Commands;
@@ -41,6 +40,10 @@ namespace RTS_LEARN.Player
         private HashSet<AbstractUnit> addedUnits = new(24);
         private List<ISelectable> selectedUnits = new(12);//keep the list Constant, don't want to resize it (resize is computationally expensive)
 
+        [SerializeField] private SupplySO mineralsSO;
+        [SerializeField] private SupplySO gasSO;
+        private int minerals;
+        private int gas;
 
         private void Awake()
         {
@@ -59,6 +62,18 @@ namespace RTS_LEARN.Player
             Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
             // Bus<UnitRemoveEvent>.OnEvent += HandleUnitRemoved;
             Bus<ActionSelectedEvent>.OnEvent += HandleActionSelected;
+            Bus<SupplyEvent>.OnEvent += (evt) =>
+            {
+                if (evt.Supply == mineralsSO)
+                {
+                    minerals += evt.Amount;
+                }
+                else if (evt.Supply == gasSO)
+                {
+                    gas += evt.Amount;
+                }
+                Debug.Log($"Minerals: {minerals}, Gas: {gas}"); // For debugging purposes
+            };
         }
 
         private void HandleUnitSpawned(UnitSpawnEvent evt) => aliveUnits.Add(evt.Unit);

@@ -17,6 +17,7 @@ namespace RTS_LEARN.Behavior
         [SerializeReference] public BlackboardVariable<GameObject> Unit;
         [SerializeReference] public BlackboardVariable<int> Amount;
         [SerializeReference] public BlackboardVariable<GatherableSupply> GatherableSupplies;
+        [SerializeReference] public BlackboardVariable<SupplySO> SupplySO;
 
         private float enterTime;
         private Animator animator;
@@ -32,6 +33,7 @@ namespace RTS_LEARN.Behavior
 
             enterTime = Time.time;
             GatherableSupplies.Value.BeginGather();
+            SupplySO.Value = GatherableSupplies.Value.Supply;
             return Status.Running;
         }
 

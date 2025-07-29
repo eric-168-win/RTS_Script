@@ -17,6 +17,7 @@ namespace RTS_LEARN.Behavior
 
         private NavMeshAgent agent;
         private Animator animator;
+        private Vector3 targetPosition;
 
         protected override Status OnStart()
         {
@@ -26,7 +27,7 @@ namespace RTS_LEARN.Behavior
             }
             Agent.Value.TryGetComponent(out animator);
 
-            Vector3 targetPosition = GetTargetPosition();
+            targetPosition = GetTargetPosition();
             if (Vector3.Distance(agent.transform.position, targetPosition) <= agent.stoppingDistance)
             {
                 return Status.Success;
@@ -51,7 +52,7 @@ namespace RTS_LEARN.Behavior
 
         protected override Status OnUpdate()
         {
-            if (agent.remainingDistance <= agent.stoppingDistance)
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
                 return Status.Success;
             }

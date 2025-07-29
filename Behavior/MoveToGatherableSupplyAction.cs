@@ -72,7 +72,7 @@ namespace RTS_LEARN.Behavior
         {
             return Physics.OverlapSphere(
                 agent.transform.position,
-                SearchRadius.Value,
+                SearchRadius,
                 suppliesMask
                 ).Where(collider =>
                 collider.TryGetComponent(out GatherableSupply supply)
