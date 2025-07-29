@@ -4,6 +4,7 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
 using UnityEngine.AI;
+using RTS_LEARN.Utilities;
 
 namespace RTS_LEARN.Behavior
 {
@@ -17,6 +18,11 @@ namespace RTS_LEARN.Behavior
         {
             if (Agent.Value.TryGetComponent(out NavMeshAgent agent))
             {
+                if (agent.TryGetComponent(out Animator animator))
+                {
+                    animator.SetFloat(AnimationConstants.SPEED, 0);
+                }
+
                 agent.ResetPath();
                 return Status.Success;
             }

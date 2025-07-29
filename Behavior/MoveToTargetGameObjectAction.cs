@@ -4,6 +4,7 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
 using UnityEngine.AI;
+using RTS_LEARN.Utilities;
 
 namespace RTS_LEARN.Behavior
 {
@@ -15,6 +16,7 @@ namespace RTS_LEARN.Behavior
         [SerializeReference] public BlackboardVariable<GameObject> TargetGameObject;
 
         private NavMeshAgent agent;
+        private Animator animator;
 
         protected override Status OnStart()
         {
@@ -22,6 +24,7 @@ namespace RTS_LEARN.Behavior
             {
                 return Status.Failure;
             }
+            Agent.Value.TryGetComponent(out animator);
 
             Vector3 targetPosition = GetTargetPosition();
             if (Vector3.Distance(agent.transform.position, targetPosition) <= agent.stoppingDistance)
@@ -52,7 +55,18 @@ namespace RTS_LEARN.Behavior
             {
                 return Status.Success;
             }
+            if (animator != null)
+            {
+                animator.SetFloat(AnimationConstants.SPEED, agent.velocity.magnitude);
+            }
+
             return Status.Running;
+        }
+
+        protected override void OnEnd()
+        {
+            if (animator != null)
+                animator.SetFloat(AnimationConstants.SPEED, 0);
         }
 
     }

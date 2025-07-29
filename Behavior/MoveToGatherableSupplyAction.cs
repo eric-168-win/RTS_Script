@@ -21,9 +21,13 @@ namespace RTS_LEARN.Behavior
         private LayerMask suppliesMask;
         private SupplySO supplySO;
 
+        private Animator animator;
+
+
         protected override Status OnStart()
         {
             suppliesMask = LayerMask.GetMask("Supplies");
+            Agent.Value.TryGetComponent(out animator);
 
             if (!HasValidInputs())
             {
@@ -55,6 +59,11 @@ namespace RTS_LEARN.Behavior
                 return Status.Running;
 
             }
+            if (animator != null)
+            {
+                animator.SetFloat(AnimationConstants.SPEED, agent.velocity.magnitude);
+            }
+
 
             return Status.Failure;
         }
@@ -112,6 +121,12 @@ namespace RTS_LEARN.Behavior
             }
             return true;
 
+        }
+
+        protected override void OnEnd()
+        {
+            if (animator != null)
+                animator.SetFloat(AnimationConstants.SPEED, 0);
         }
     }
 }

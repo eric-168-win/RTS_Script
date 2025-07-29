@@ -4,6 +4,7 @@ using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
 using UnityEngine.AI;
+using RTS_LEARN.Utilities;
 
 namespace RTS_LEARN.Behavior
 {
@@ -15,6 +16,7 @@ namespace RTS_LEARN.Behavior
         [SerializeReference] public BlackboardVariable<Vector3> TargetLocation;
 
         private NavMeshAgent agent;
+        private Animator animator;
 
         protected override Status OnStart()
         {
@@ -22,6 +24,7 @@ namespace RTS_LEARN.Behavior
             {
                 return Status.Failure;
             }
+            Agent.Value.TryGetComponent(out animator);
 
             if (Vector3.Distance(agent.transform.position, TargetLocation.Value) <= agent.stoppingDistance)
             {
@@ -35,6 +38,12 @@ namespace RTS_LEARN.Behavior
 
         protected override Status OnUpdate()
         {
+            if (animator != null)
+            {
+                animator.SetFloat(AnimationConstants.SPEED, agent.velocity.magnitude);
+                // Animator.StringToHash("Speed") //Faster than "Speed"
+            }
+
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             //OnUpdate is not deplayed a frame anymore => Add !agent.pathPending &&
             {
@@ -44,10 +53,11 @@ namespace RTS_LEARN.Behavior
             return Status.Running;
         }
 
-        // protected override void OnEnd()
-        // //every time we exit the node//doesn't matter is success or failure
-        // {
-        // }
+        protected override void OnEnd()
+        {
+            if (animator != null)
+                animator.SetFloat(AnimationConstants.SPEED, 0);
+        }
     }
 
 }
