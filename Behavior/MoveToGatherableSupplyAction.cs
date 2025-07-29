@@ -19,21 +19,18 @@ namespace RTS_LEARN.Behavior
         [SerializeReference] public BlackboardVariable<float> SearchRadius = new(7f);
         private NavMeshAgent agent;
         private LayerMask suppliesMask;
+        private SupplySO supplySO;
 
         protected override Status OnStart()
         {
-            if (!Agent.Value.TryGetComponent(out agent))
+            suppliesMask = LayerMask.GetMask("Supplies");
+
+            if (!HasValidInputs())
             {
                 return Status.Failure;
             }
 
             Vector3 targetPosition = GetTargetPosition();
-            if (Vector3.Distance(agent.transform.position, targetPosition) <= agent.stoppingDistance)
-            {
-                return Status.Success;
-            }
-            suppliesMask = LayerMask.GetMask("Supplies");
-
             agent.SetDestination(targetPosition);
             return Status.Running;
         }
@@ -44,21 +41,11 @@ namespace RTS_LEARN.Behavior
             {
                 return Status.Running;
             }
-            if (!Supply.Value.IsBusy && Supply.Value.Amount > 0)
+            if (Supply.Value != null && !Supply.Value.IsBusy && Supply.Value.Amount > 0)
             {
                 return Status.Success;
             }
-
-            Collider[] colliders = Physics.OverlapSphere(
-                agent.transform.position,
-                SearchRadius.Value,
-                suppliesMask
-                ).Where(collider =>
-                collider.TryGetComponent(out GatherableSupply supply)
-                    && !supply.IsBusy
-                    && supply.Supply.Equals(Supply.Value.Supply)
-                ).ToArray();
-
+            Collider[] colliders = FindNearByNotBusyColliders();
 
             if (colliders.Length > 0)
             {
@@ -70,6 +57,19 @@ namespace RTS_LEARN.Behavior
             }
 
             return Status.Failure;
+        }
+
+        private Collider[] FindNearByNotBusyColliders()
+        {
+            return Physics.OverlapSphere(
+                agent.transform.position,
+                SearchRadius.Value,
+                suppliesMask
+                ).Where(collider =>
+                collider.TryGetComponent(out GatherableSupply supply)
+                    && !supply.IsBusy
+                    && supply.Supply.Equals(supplySO)
+                ).ToArray();
         }
 
         private Vector3 GetTargetPosition()
@@ -84,6 +84,34 @@ namespace RTS_LEARN.Behavior
                 obj = Supply.Value.transform.position;
             }
             return obj;
+        }
+
+        public bool HasValidInputs()
+        {
+            if (!Agent.Value.TryGetComponent(out agent) || (Supply.Value == null && supplySO == null))
+            {
+                return false;
+            }
+
+            if (Supply.Value != null)
+            {
+                supplySO = Supply.Value.Supply;
+            }
+            else
+            {
+                Collider[] colliders = FindNearByNotBusyColliders();
+                if (colliders.Length > 0)
+                {
+                    Array.Sort(colliders, new ClosestColliderComparer(agent.transform.position));
+                    Supply.Value = colliders[0].GetComponent<GatherableSupply>();
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return true;
+
         }
     }
 }

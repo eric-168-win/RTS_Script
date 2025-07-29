@@ -34,5 +34,10 @@ namespace RTS_LEARN.Environment
             }
             return amountGathered;
         }
+
+        public void AbortGather()
+        {
+            IsBusy = false;
+        }
     }
 }
