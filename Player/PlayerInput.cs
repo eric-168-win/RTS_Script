@@ -28,6 +28,7 @@ namespace RTS_LEARN.Player
         private Vector2 startingMousePosition;
 
         private ActionBase activeAction;
+        private GameObject ghostInstance;
         private bool wasMouseDownOnUI;
         private CinemachineFollow cinemachineFollow;
         private float zoomStartTime;
@@ -90,6 +91,10 @@ namespace RTS_LEARN.Player
             {
                 ActivateAction(new RaycastHit());
             }
+            else if (activeAction.GhostPrefab != null)
+            {
+                ghostInstance = Instantiate(activeAction.GhostPrefab);
+            }
         }
 
 
@@ -104,13 +109,33 @@ namespace RTS_LEARN.Player
 
         void Update()
         {
-            HandleRotation();
-            HandleZooming();
             HandlePanning();
+            HandleZooming();
+            HandleRotation();
+            HandleGhost();
             HandleRightClick();
             HandleDragSelectByLeft();
+
         }
 
+        private void HandleGhost()
+        {
+            if (ghostInstance == null) return;
+
+            if (Keyboard.current.escapeKey.wasReleasedThisFrame)
+            {
+                Destroy(ghostInstance);
+                ghostInstance = null;
+                activeAction = null;
+                return;
+            }
+
+            Ray cameraRay = camera.ScreenPointToRay(Mouse.current.position.ReadValue());
+            if (Physics.Raycast(cameraRay, out RaycastHit hit, float.MaxValue, floorLayers))
+            {
+                ghostInstance.transform.position = hit.point;
+            }
+        }
 
         private void HandleDragSelectByLeft()
         {
@@ -262,6 +287,12 @@ namespace RTS_LEARN.Player
 
         private void ActivateAction(RaycastHit hit)
         {
+            if (ghostInstance != null)
+            {
+                Destroy(ghostInstance);
+                ghostInstance = null;
+            }
+
             List<AbstractCommandable> absCmdables = selectedUnits
                 .Where((unit) => unit is AbstractCommandable)
                 .Cast<AbstractCommandable>()

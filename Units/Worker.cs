@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace RTS_LEARN.Units
 {
-    public class Worker : AbstractUnit //MonoBehaviour, ISelectable, IMoveable
+    public class Worker : AbstractUnit, IBuildingBuilder
     {
         public bool HasSupplies
         {
@@ -45,11 +45,30 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Command", UnitCommands.Gather);
         }
 
+        public GameObject Build(BuildingSO building, Vector3 targetLocation)
+        {
+            GameObject instance = Instantiate(building.Prefab, targetLocation, Quaternion.identity);
+            if (instance.TryGetComponent(out BaseBuilding baseBuilding))
+            {
+                baseBuilding.ShowGhostVisuals();
+            }
+            else
+            {
+                Debug.LogError($"Missing BaseBuilding on Prefab for BuildingSO \"{building.name}\"! Cannot build!");
+                return null;
+            }
+            // set up blackboard to build!
+            
+            return instance;
+        }
+
+
         public void ReturnSupplies(GameObject commandPost)
         {
             graphAgent.SetVariableValue("CommandPost", commandPost);
             graphAgent.SetVariableValue("Command", UnitCommands.ReturnSupplies);
         }
+
 
     }
 }

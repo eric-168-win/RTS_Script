@@ -11,12 +11,20 @@ namespace RTS_LEARN.Units
         public AbstractUnitSO[] Queue => buildingQueue.ToArray();
         [field: SerializeField] public float CurrentQueueStartTime { get; private set; }
         [field: SerializeField] public AbstractUnitSO BuildingUnit { get; private set; }
+        [SerializeField] private MeshRenderer mainRenderer;
 
         public delegate void QueueUpdatedEvent(AbstractUnitSO[] unitsInQueue);
         public event QueueUpdatedEvent OnQueueUpdated;
+        private BuildingSO buildingSO;
 
         private List<AbstractUnitSO> buildingQueue = new(MAX_QUEUE_SIZE);
         private const int MAX_QUEUE_SIZE = 5;
+
+        private void Awake()
+        {
+            buildingSO = UnitSO as BuildingSO;
+        }
+
 
         public void BuildUnit(AbstractUnitSO unit)
         {
@@ -57,6 +65,12 @@ namespace RTS_LEARN.Units
                 OnQueueUpdated?.Invoke(buildingQueue.ToArray());
             }
         }
+
+        public void ShowGhostVisuals()
+        {
+            mainRenderer.material = buildingSO.PlacementMaterial;
+        }
+
         private IEnumerator DoBuildUnit()
         {
             while (buildingQueue.Count > 0)
