@@ -58,7 +58,11 @@ namespace RTS_LEARN.Units
                 return null;
             }
             // set up blackboard to build!
-            
+            graphAgent.SetVariableValue("BuildingSO", building);
+            graphAgent.SetVariableValue("TargetLocation", targetLocation);
+            graphAgent.SetVariableValue("Ghost", instance);
+            graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
+
             return instance;
         }
 

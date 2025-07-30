@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 
 namespace RTS_LEARN.Units
@@ -11,8 +12,8 @@ namespace RTS_LEARN.Units
         public AbstractUnitSO[] Queue => buildingQueue.ToArray();
         [field: SerializeField] public float CurrentQueueStartTime { get; private set; }
         [field: SerializeField] public AbstractUnitSO BuildingUnit { get; private set; }
-        [SerializeField] private MeshRenderer mainRenderer;
-
+        [field: SerializeField] public MeshRenderer MainRenderer { get; private set; }
+        [SerializeField] private NavMeshObstacle navMeshObstacle;
         public delegate void QueueUpdatedEvent(AbstractUnitSO[] unitsInQueue);
         public event QueueUpdatedEvent OnQueueUpdated;
         private BuildingSO buildingSO;
@@ -25,6 +26,15 @@ namespace RTS_LEARN.Units
             buildingSO = UnitSO as BuildingSO;
         }
 
+        protected override void Start()
+        {
+            base.Start();
+
+            if (navMeshObstacle != null)
+            {
+                navMeshObstacle.enabled = true;
+            }
+        }
 
         public void BuildUnit(AbstractUnitSO unit)
         {
@@ -68,7 +78,7 @@ namespace RTS_LEARN.Units
 
         public void ShowGhostVisuals()
         {
-            mainRenderer.material = buildingSO.PlacementMaterial;
+            MainRenderer.material = buildingSO.PlacementMaterial;
         }
 
         private IEnumerator DoBuildUnit()

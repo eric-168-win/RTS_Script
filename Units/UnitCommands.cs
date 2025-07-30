@@ -9,6 +9,7 @@ namespace RTS_LEARN.Units
         Stop,
         Move,
         Gather,
-        ReturnSupplies
+        ReturnSupplies,
+        BuildBuilding
     }
 }
