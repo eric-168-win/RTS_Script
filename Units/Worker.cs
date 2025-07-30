@@ -1,3 +1,4 @@
+using System;
 using RTS_LEARN.Behavior;
 using RTS_LEARN.Environment;
 using RTS_LEARN.Event;
@@ -9,6 +10,19 @@ namespace RTS_LEARN.Units
 {
     public class Worker : AbstractUnit //MonoBehaviour, ISelectable, IMoveable
     {
+        public bool HasSupplies
+        {
+            get
+            {
+                if (graphAgent != null && graphAgent.GetVariable("SupplyAmountHeld", out BlackboardVariable<int> heldVariable))
+                {
+                    return heldVariable.Value > 0;
+                }
+
+                return false;
+            }
+        }
+
         protected override void Start()
         {
             base.Start();
@@ -17,6 +31,13 @@ namespace RTS_LEARN.Units
                 eventChannelVariable.Value.Event += HandleGatherSupplies;
             }
         }
+
+        private void HandleGatherSupplies(GameObject self, int amount, SupplySO supply)
+        {
+            Bus<SupplyEvent>.Raise(new SupplyEvent(amount, supply));
+        }
+
+
         public void Gather(GatherableSupply supply)
         {
             graphAgent.SetVariableValue("Supply", supply);
@@ -24,9 +45,11 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Command", UnitCommands.Gather);
         }
 
-        private void HandleGatherSupplies(GameObject self, int amount, SupplySO supply)
+        public void ReturnSupplies(GameObject commandPost)
         {
-            Bus<SupplyEvent>.Raise(new SupplyEvent(amount, supply));
+            graphAgent.SetVariableValue("CommandPost", commandPost);
+            graphAgent.SetVariableValue("Command", UnitCommands.ReturnSupplies);
         }
+
     }
 }

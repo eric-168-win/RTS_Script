@@ -8,7 +8,7 @@ namespace RTS_LEARN.Units
     {
         Stop,
         Move,
-
-        Gather
+        Gather,
+        ReturnSupplies
     }
 }

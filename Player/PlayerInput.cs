@@ -72,7 +72,7 @@ namespace RTS_LEARN.Player
                 {
                     gas += evt.Amount;
                 }
-                Debug.Log($"Minerals: {minerals}, Gas: {gas}"); // For debugging purposes
+                // Debug.Log($"Minerals: {minerals}, Gas: {gas}"); // For debugging purposes
             };
         }
 
@@ -278,6 +278,7 @@ namespace RTS_LEARN.Player
 
         private void HandlePanning()
         {
+            return;
             Vector2 moveAmount = GetKeyboardMovement();
             moveAmount += GetMouseMovement();
             // cameraTarget(Transform) insead of using Rigidbody

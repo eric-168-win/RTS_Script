@@ -28,7 +28,10 @@ namespace RTS_LEARN.Behavior
             {
                 return Status.Failure;
             }
-            Unit.Value.TryGetComponent(out animator);
+            if (animator == null)
+            {
+                Unit.Value.TryGetComponent(out animator);
+            }
             animator.SetBool(AnimationConstants.IS_GATHERING, true);
 
             enterTime = Time.time;

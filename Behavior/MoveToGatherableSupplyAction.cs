@@ -41,7 +41,12 @@ namespace RTS_LEARN.Behavior
 
         protected override Status OnUpdate()
         {
-            if (agent.remainingDistance >= agent.stoppingDistance)
+            if (animator != null)
+            {
+                animator.SetFloat(AnimationConstants.SPEED, agent.velocity.magnitude);
+            }
+
+            if (!agent.pathPending && agent.remainingDistance >= agent.stoppingDistance)
             {
                 return Status.Running;
             }
@@ -59,12 +64,6 @@ namespace RTS_LEARN.Behavior
                 return Status.Running;
 
             }
-            if (animator != null)
-            {
-                animator.SetFloat(AnimationConstants.SPEED, agent.velocity.magnitude);
-            }
-
-
             return Status.Failure;
         }
 
@@ -92,6 +91,7 @@ namespace RTS_LEARN.Behavior
             {
                 obj = Supply.Value.transform.position;
             }
+            // Debug.Log(agent.name + "Target positionAAAA: " + obj);
             return obj;
         }
 
