@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace RTS_LEARN.UI.Components
 {
-    public class UIBuildQueueButton : MonoBehaviour, IUIElement<UnitSO, UnityAction>
+    public class UIBuildQueueButton : MonoBehaviour, IUIElement<AbstractUnitSO, UnityAction>
     {
         [SerializeField] private Image icon;
         private Button button;
@@ -15,7 +15,7 @@ namespace RTS_LEARN.UI.Components
             button = GetComponent<Button>();
             Disable();
         }
-        public void EnableFor(UnitSO item, UnityAction callback)
+        public void EnableFor(AbstractUnitSO item, UnityAction callback)
         {
             button.onClick.RemoveAllListeners();
             button.interactable = true;

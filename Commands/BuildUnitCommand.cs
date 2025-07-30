@@ -4,9 +4,9 @@ using UnityEngine;
 namespace RTS_LEARN.Commands
 {
     [CreateAssetMenu(fileName = "Build Unit Action", menuName = "Buildings/Commands/Build Unit", order = 120)]
-    public class BuidUnitCommand : ActionBase
+    public class BuildUnitCommand : ActionBase
     {
-        [field: SerializeField] public UnitSO Unit { get; private set; }
+        [field: SerializeField] public AbstractUnitSO Unit { get; private set; }
 
 
         public override bool CanHandle(CommandContext context)

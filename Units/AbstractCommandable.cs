@@ -16,7 +16,7 @@ namespace RTS_LEARN.Units
         [SerializeField] private DecalProjector decalProjector;
         private ActionBase[] initialCommands;
 
-        [field: SerializeField] public UnitSO UnitSO { get; private set; }
+        [field: SerializeField] public AbstractUnitSO UnitSO { get; private set; }
 
         protected virtual void Start()
         {
