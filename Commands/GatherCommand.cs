@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace RTS_LEARN.Commands
 {
-    [CreateAssetMenu(fileName = "Gather Action", menuName = "AI/Commands/Gather", order = 105)]
+    [CreateAssetMenu(fileName = "Gather Action", menuName = "Units/Commands/Gather", order = 105)]
     public class GatherCommand : ActionBase
     {
         [SerializeField] private UnitSO commandPostSO;

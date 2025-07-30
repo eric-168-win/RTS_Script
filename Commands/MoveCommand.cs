@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RTS_LEARN.Commands
 {
-    [CreateAssetMenu(fileName = "Move Action", menuName = "AI/Actions/Move", order = 100)]
+    [CreateAssetMenu(fileName = "Move Action", menuName = "Units/Commands/Move", order = 100)]
     public class MoveCommand : ActionBase
     {
         [SerializeField] private float radiusMultiplied = 3.5f;

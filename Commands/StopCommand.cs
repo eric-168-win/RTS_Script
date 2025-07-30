@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace RTS_LEARN.Commands
 {
-    [CreateAssetMenu(fileName = "Stop Action", menuName = "AI/Actions/Stop", order = 101)]
+    [CreateAssetMenu(fileName = "Stop Action", menuName = "Units/Commands/Stop", order = 101)]
     public class StopCommand : ActionBase
     {
         public override bool CanHandle(CommandContext context)

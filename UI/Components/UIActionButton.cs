@@ -20,6 +20,7 @@ namespace RTS_LEARN.UI.Components
 
         public void EnableFor(ActionBase action, UnityAction onClick)
         {
+            button.onClick.RemoveAllListeners();
             SetIcon(action.Icon);
             button.interactable = true;
             button.onClick.AddListener(onClick);

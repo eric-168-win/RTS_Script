@@ -78,7 +78,10 @@ namespace RTS_LEARN.Player
 
         private void HandleUnitSpawned(UnitSpawnEvent evt) => aliveUnits.Add(evt.Unit);
         // private void HandleUnitRemoved(UnitRemoveEvent evt) => aliveUnits.Remove(evt.Unit);
-        private void HandleUnitSelected(UnitSelectedEvent evt) => selectedUnits.Add(evt.Unit);
+        private void HandleUnitSelected(UnitSelectedEvent evt)
+        {
+            selectedUnits.Add(evt.Unit);
+        }
         private void HandleUnitDeselected(UnitDeselectedEvent evt) => selectedUnits.Remove(evt.Unit);
         private void HandleActionSelected(ActionSelectedEvent evt)
         {

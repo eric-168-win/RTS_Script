@@ -14,6 +14,8 @@ namespace RTS_LEARN.Units
         [field: SerializeField] public int MaxHealth { get; private set; }
         [field: SerializeField] public ActionBase[] AvailableCommands { get; private set; }
         [SerializeField] private DecalProjector decalProjector;
+        private ActionBase[] initialCommands;
+
         [field: SerializeField] public UnitSO UnitSO { get; private set; }
 
         protected virtual void Start()
@@ -22,6 +24,7 @@ namespace RTS_LEARN.Units
             //virtual => child classes can override this method
             CurrentHealth = UnitSO.Health;
             MaxHealth = UnitSO.Health;
+            initialCommands = AvailableCommands;
         }
 
 
@@ -40,7 +43,23 @@ namespace RTS_LEARN.Units
             {
                 decalProjector.gameObject.SetActive(false);
             }
+            SetCommandOverrides(null);
+
             Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this));
         }
+
+        public void SetCommandOverrides(ActionBase[] commands)
+        {
+            if (commands == null || commands.Length == 0)
+            {
+                AvailableCommands = initialCommands;
+            }
+            else
+            {
+                AvailableCommands = commands;
+            }
+            Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
+        }
+
     }
 }
