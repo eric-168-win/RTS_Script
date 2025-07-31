@@ -24,7 +24,10 @@ namespace RTS_LEARN.Behavior
         protected override Status OnStart()
         {
             if (Self.Value == null) return Status.Failure;
-            animator = Self.Value.GetComponent<Animator>();
+            if (animator == null)
+            {
+                animator = Self.Value.GetComponent<Animator>();
+            }
 
 
             selfTransform = Self.Value.transform;
