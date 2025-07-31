@@ -61,7 +61,6 @@ namespace RTS_LEARN.Player
             Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
             Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
-            // Bus<UnitRemoveEvent>.OnEvent += HandleUnitRemoved;
             Bus<ActionSelectedEvent>.OnEvent += HandleActionSelected;
             Bus<SupplyEvent>.OnEvent += (evt) =>
             {
@@ -78,10 +77,13 @@ namespace RTS_LEARN.Player
         }
 
         private void HandleUnitSpawned(UnitSpawnEvent evt) => aliveUnits.Add(evt.Unit);
-        // private void HandleUnitRemoved(UnitRemoveEvent evt) => aliveUnits.Remove(evt.Unit);
         private void HandleUnitSelected(UnitSelectedEvent evt)
         {
-            selectedUnits.Add(evt.Unit);
+            if (!selectedUnits.Contains(evt.Unit))
+            {
+                selectedUnits.Add(evt.Unit);
+            }
+
         }
         private void HandleUnitDeselected(UnitDeselectedEvent evt) => selectedUnits.Remove(evt.Unit);
         private void HandleActionSelected(ActionSelectedEvent evt)
@@ -103,7 +105,6 @@ namespace RTS_LEARN.Player
             Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
             Bus<UnitSpawnEvent>.OnEvent -= HandleUnitSpawned;
-            // Bus<UnitRemoveEvent>.OnEvent -= HandleUnitRemoved;
             Bus<ActionSelectedEvent>.OnEvent -= HandleActionSelected;
         }
 

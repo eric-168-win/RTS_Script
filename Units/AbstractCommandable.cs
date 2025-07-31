@@ -24,11 +24,12 @@ namespace RTS_LEARN.Units
             //virtual => child classes can override this method
             CurrentHealth = UnitSO.Health;
             MaxHealth = UnitSO.Health;
+
             initialCommands = AvailableCommands;
         }
 
 
-        public void Select()
+        public virtual void Select()
         {
             if (decalProjector != null)
             {
@@ -37,7 +38,7 @@ namespace RTS_LEARN.Units
             Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
         }
 
-        public void Deselect()
+        public virtual void Deselect()
         {
             if (decalProjector != null)
             {

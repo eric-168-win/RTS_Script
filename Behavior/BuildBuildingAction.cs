@@ -4,6 +4,7 @@ using Unity.Behavior;
 using UnityEngine;
 using Action = Unity.Behavior.Action;
 using Unity.Properties;
+using Unity.VisualScripting;
 
 namespace RTS_LEARN.Behavior
 {
@@ -15,9 +16,11 @@ namespace RTS_LEARN.Behavior
         [SerializeReference] public BlackboardVariable<GameObject> Self;
         [SerializeReference] public BlackboardVariable<BuildingSO> BuildingSO;
         [SerializeReference] public BlackboardVariable<Vector3> TargetLocation;
+        [SerializeReference] public BlackboardVariable<BaseBuilding> BuildingUnderConstruction;
         private float startBuildTime;
         private BaseBuilding completedBuilding;
         private Vector3 startPosition;
+        private Vector3 endPosition;
 
 
         protected override Status OnStart()
@@ -25,10 +28,15 @@ namespace RTS_LEARN.Behavior
             if (!HasValidInputs()) return Status.Failure;
             startBuildTime = Time.time;
             GameObject building = GameObject.Instantiate(BuildingSO.Value.Prefab);
-            completedBuilding = building.GetComponent<BaseBuilding>();
+            building.name = " (Real) " + BuildingSO.Value.name;
+            if (!building.TryGetComponent(out completedBuilding)
+                || completedBuilding.MainRenderer == null) return Status.Failure;
             Renderer buildingRenderer = completedBuilding.MainRenderer;
 
+            BuildingUnderConstruction.Value = completedBuilding;
+
             startPosition = TargetLocation.Value - Vector3.up * buildingRenderer.bounds.size.y;
+            endPosition = TargetLocation.Value;
             completedBuilding.transform.position = startPosition;
             return Status.Running;
         }
@@ -38,7 +46,7 @@ namespace RTS_LEARN.Behavior
         {
             float normalizedTime = (Time.time - startBuildTime) / BuildingSO.Value.BuildTime;
             //normalizedTime = [0 to 1]
-            completedBuilding.transform.position = Vector3.Lerp(startPosition, TargetLocation.Value, normalizedTime);
+            completedBuilding.transform.position = Vector3.Lerp(startPosition, endPosition, normalizedTime);
 
             return normalizedTime >= 1 ? Status.Success : Status.Running;
         }
