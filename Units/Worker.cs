@@ -1,5 +1,6 @@
 using System;
 using RTS_LEARN.Behavior;
+using RTS_LEARN.Commands;
 using RTS_LEARN.Environment;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
@@ -10,6 +11,7 @@ namespace RTS_LEARN.Units
 {
     public class Worker : AbstractUnit, IBuildingBuilder
     {
+        [SerializeField] private ActionBase CancelBuildingCommand;
         public bool HasSupplies
         {
             get
@@ -63,6 +65,9 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Ghost", instance);
             graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
 
+            SetCommandOverrides(new ActionBase[] { CancelBuildingCommand });
+            Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
+
             return instance;
         }
 
@@ -73,6 +78,22 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Command", UnitCommands.ReturnSupplies);
         }
 
+        public void CancelBuilding()
+        {
+            if (graphAgent.GetVariable("Ghost", out BlackboardVariable<GameObject> ghostVariable)
+                && ghostVariable.Value != null)
+            {
+                Destroy(ghostVariable.Value);
+            }
+            if (graphAgent.GetVariable("BuildingUnderConstruction", out BlackboardVariable<BaseBuilding> buildingVariable)
+                && buildingVariable.Value != null)
+            {
+                Destroy(buildingVariable.Value.gameObject);//must add gameObject Not Just BaseBuilding
+            }
+
+            SetCommandOverrides(Array.Empty<ActionBase>());
+            Stop();
+        }
 
     }
 }
