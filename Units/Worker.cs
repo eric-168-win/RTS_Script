@@ -52,7 +52,7 @@ namespace RTS_LEARN.Units
             GameObject instance = Instantiate(building.Prefab, targetLocation, Quaternion.identity);
             if (instance.TryGetComponent(out BaseBuilding baseBuilding))
             {
-                baseBuilding.ShowGhostVisuals();
+                baseBuilding.StartBuilding(this);
             }
             else
             {
