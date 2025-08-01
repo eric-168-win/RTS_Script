@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RTS_LEARN.Commands;
@@ -61,6 +62,7 @@ namespace RTS_LEARN.Player
             Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
             Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
+            Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
             Bus<ActionSelectedEvent>.OnEvent += HandleActionSelected;
             Bus<SupplyEvent>.OnEvent += (evt) =>
             {
@@ -75,6 +77,13 @@ namespace RTS_LEARN.Player
                 // Debug.Log($"Minerals: {minerals}, Gas: {gas}"); // For debugging purposes
             };
         }
+
+        private void HandleUnitDeath(UnitDeathEvent evt)
+        {
+            aliveUnits.Remove(evt.Unit);
+            selectedUnits.Remove(evt.Unit);
+        }
+
 
         private void HandleUnitSpawned(UnitSpawnEvent evt) => aliveUnits.Add(evt.Unit);
         private void HandleUnitSelected(UnitSelectedEvent evt)
@@ -106,6 +115,8 @@ namespace RTS_LEARN.Player
             Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
             Bus<UnitSpawnEvent>.OnEvent -= HandleUnitSpawned;
             Bus<ActionSelectedEvent>.OnEvent -= HandleActionSelected;
+            Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+
         }
 
         void Update()

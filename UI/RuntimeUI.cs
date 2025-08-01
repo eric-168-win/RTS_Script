@@ -22,6 +22,7 @@ namespace RTS_LEARN.UI
         {
             Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
+            Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
         }
 
         void Start()
@@ -34,7 +35,16 @@ namespace RTS_LEARN.UI
         {
             Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
+            Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+
         }
+
+        private void HandleUnitDeath(UnitDeathEvent evt)
+        {
+            selectedUnits.Remove(evt.Unit);
+            RefreshUI();
+        }
+
 
         private void HandleUnitSelected(UnitSelectedEvent evt)
         {
@@ -54,34 +64,31 @@ namespace RTS_LEARN.UI
             if (evt.Unit is AbstractCommandable commandable)
             {
                 selectedUnits.Remove(commandable);
-                if (selectedUnits.Count > 0)
+                RefreshUI();
+            }
+        }
+
+        private void RefreshUI()
+        {
+            if (selectedUnits.Count > 0)
+            {
+                actionsUI.EnableFor(selectedUnits);
+                if (selectedUnits.Count == 1 && selectedUnits.First() is BaseBuilding building)
                 {
-                    actionsUI.EnableFor(selectedUnits);
-                    if (selectedUnits.Count == 1 && selectedUnits.First() is BaseBuilding building)
-                    {
-                        buildingBuildingUI.EnableFor(building);
-                    }
-                    else
-                    {
-                        buildingBuildingUI.Disable();
-                    }
+                    buildingBuildingUI.EnableFor(building);
                 }
                 else
                 {
-                    actionsUI.Disable();
                     buildingBuildingUI.Disable();
                 }
             }
-
+            else
+            {
+                actionsUI.Disable();
+                buildingBuildingUI.Disable();
+            }
         }
 
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-
-
-        // Update is called once per frame
-        void Update()
-        {
-
-        }
     }
+
 }
