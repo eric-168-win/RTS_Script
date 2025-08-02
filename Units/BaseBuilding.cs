@@ -15,24 +15,26 @@ namespace RTS_LEARN.Units
         [field: SerializeField] public float CurrentQueueStartTime { get; private set; }
         [field: SerializeField] public AbstractUnitSO BuildingUnit { get; private set; }
         [field: SerializeField] public MeshRenderer MainRenderer { get; private set; }
+        [field: SerializeField] public BuildingProgress Progress { get; private set; } = new(
+            BuildingProgress.BuildingState.Destroyed, 0, 0
+        );
+        [field: SerializeField] public BuildingSO BuildingSO { get; private set; }
+
+
         [SerializeField] private Material primaryMaterial;
         [SerializeField] private NavMeshObstacle navMeshObstacle;
+
         public delegate void QueueUpdatedEvent(AbstractUnitSO[] unitsInQueue);
         public event QueueUpdatedEvent OnQueueUpdated;
-        private BuildingSO buildingSO;
 
         private List<AbstractUnitSO> buildingQueue = new(MAX_QUEUE_SIZE);
         private const int MAX_QUEUE_SIZE = 5;
-
-        [field: SerializeField]
-        public BuildingProgress Progress { get; private set; } = new(
-            BuildingProgress.BuildingState.Destroyed, 0, 0
-        );
         private IBuildingBuilder unitBuildingThis;
+
 
         private void Awake()
         {
-            buildingSO = UnitSO as BuildingSO;
+            BuildingSO = UnitSO as BuildingSO;
         }
 
         protected override void Start()
@@ -91,11 +93,11 @@ namespace RTS_LEARN.Units
         public void StartBuilding(IBuildingBuilder buildingBuilder)
         {
             unitBuildingThis = buildingBuilder;
-            MainRenderer.material = buildingSO.PlacementMaterial;
+            MainRenderer.material = BuildingSO.PlacementMaterial;
 
             Progress = new BuildingProgress(
                 BuildingProgress.BuildingState.Building,
-                Time.time - buildingSO.BuildTime * Progress.Progress,
+                Time.time - BuildingSO.BuildTime * Progress.Progress,
                 Progress.Progress
             );
 
@@ -111,7 +113,7 @@ namespace RTS_LEARN.Units
                 Progress = new BuildingProgress(
                     BuildingProgress.BuildingState.Paused,
                     Progress.StartTime,
-                    (Time.time - Progress.StartTime) / buildingSO.BuildTime
+                    (Time.time - Progress.StartTime) / BuildingSO.BuildTime
                 );
 
                 Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;

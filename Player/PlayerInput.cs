@@ -241,6 +241,30 @@ namespace RTS_LEARN.Player
             );
         }
 
+        private List<ActionBase> GetAvailableCommands(AbstractUnit unit)
+        {
+            OverrideCommandsCommand[] overrideCommandsCommands = unit.AvailableCommands
+                .Where(command => command is OverrideCommandsCommand)
+                .Cast<OverrideCommandsCommand>()
+                .ToArray();
+
+            List<ActionBase> allAvailableCommands = new();
+
+            foreach (OverrideCommandsCommand overrideCommand in overrideCommandsCommands)//hard to understand
+            {
+                allAvailableCommands.AddRange(overrideCommand.Commands
+                    .Where(command => command is not OverrideCommandsCommand)
+                );//show building Command has Reset Command !!!
+            }
+            //--------------------------------------------------------------------
+            allAvailableCommands.AddRange(unit.AvailableCommands
+                .Where(command => command is not OverrideCommandsCommand)
+            );
+
+            return allAvailableCommands;
+        }
+
+
         private void HandleRightClick()
         {
             if (selectedUnits.Count == 0) { return; }
@@ -263,7 +287,7 @@ namespace RTS_LEARN.Player
                     for (int i = 0; i < abstractUnits.Count; i++)
                     {
                         CommandContext context = new(abstractUnits[i], hit, i);
-                        foreach (ICommand command in abstractUnits[i].AvailableCommands)
+                        foreach (ICommand command in GetAvailableCommands(abstractUnits[i]))
                         {
                             if (command.CanHandle(context))
                             {
@@ -313,10 +337,7 @@ namespace RTS_LEARN.Player
             for (int i = 0; i < absCmdables.Count; i++)
             {
                 CommandContext context = new(absCmdables[i], hit, i);
-                if (activeAction.CanHandle(context))
-                {
-                    activeAction.Handle(context);
-                }
+                activeAction.Handle(context);
             }
 
             activeAction = null; // Reset active action after handling

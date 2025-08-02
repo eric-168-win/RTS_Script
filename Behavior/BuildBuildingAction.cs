@@ -20,7 +20,6 @@ namespace RTS_LEARN.Behavior
         private float startBuildTime;
         private BaseBuilding completedBuilding;
         private Renderer buildingRenderer;
-        private GameObject meshRenderObject;
         private Vector3 startPosition;
         private Vector3 endPosition;
 
@@ -29,21 +28,34 @@ namespace RTS_LEARN.Behavior
         {
             if (!HasValidInputs()) return Status.Failure;
             startBuildTime = Time.time;
-            GameObject building = GameObject.Instantiate(BuildingSO.Value.Prefab, TargetLocation, Quaternion.identity);
 
-            if (!building.TryGetComponent(out completedBuilding)
-                || completedBuilding.MainRenderer == null) return Status.Failure;
+            if (BuildingUnderConstruction.Value == null)
+            {
+                GameObject building = GameObject.Instantiate(BuildingSO.Value.Prefab, TargetLocation, Quaternion.identity);
+                if (!building.TryGetComponent(out completedBuilding)
+                     || completedBuilding.MainRenderer == null)
+                {
+                    return Status.Failure;
+                }
+            }
+            else
+            {
+                completedBuilding = BuildingUnderConstruction.Value;
+            }
+
+            completedBuilding.StartBuilding(Self.Value.GetComponent<IBuildingBuilder>());
+            startBuildTime = completedBuilding.Progress.StartTime;
 
             buildingRenderer = completedBuilding.MainRenderer;
-
             BuildingUnderConstruction.Value = completedBuilding;
 
             startPosition = TargetLocation.Value - Vector3.up * buildingRenderer.bounds.size.y;
             endPosition = TargetLocation.Value;
             buildingRenderer.transform.position = startPosition;
-            return Status.Running;
+        
+            // return Status.Running;
+            return OnUpdate();
         }
-
 
         protected override Status OnUpdate()
         {

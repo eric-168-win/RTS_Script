@@ -50,15 +50,12 @@ namespace RTS_LEARN.Units
         public GameObject Build(BuildingSO building, Vector3 targetLocation)
         {
             GameObject instance = Instantiate(building.Prefab, targetLocation, Quaternion.identity);
-            if (instance.TryGetComponent(out BaseBuilding baseBuilding))
-            {
-                baseBuilding.StartBuilding(this);
-            }
-            else
+            if (!instance.TryGetComponent(out BaseBuilding _1))
             {
                 Debug.LogError($"Missing BaseBuilding on Prefab for BuildingSO \"{building.name}\"! Cannot build!");
                 return null;
             }
+
             // set up blackboard to build!
             graphAgent.SetVariableValue("BuildingSO", building);
             graphAgent.SetVariableValue("TargetLocation", targetLocation);
@@ -70,6 +67,19 @@ namespace RTS_LEARN.Units
 
             return instance;
         }
+
+        public void ResumeBuilding(BaseBuilding building)
+        {
+            graphAgent.SetVariableValue("TargetLocation", building.transform.position);
+            graphAgent.SetVariableValue("BuildingUnderConstruction", building);
+            graphAgent.SetVariableValue("BuildingSO", building.BuildingSO);
+            graphAgent.SetVariableValue<GameObject>("Ghost", null);
+            graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
+
+            SetCommandOverrides(new ActionBase[] { CancelBuildingCommand });
+            Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
+        }
+
 
 
         public void ReturnSupplies(GameObject commandPost)
