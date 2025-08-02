@@ -1,3 +1,4 @@
+using System.Linq;
 using RTS_LEARN.Units;
 using UnityEngine;
 
@@ -14,6 +15,9 @@ namespace RTS_LEARN.Commands
 
             if (context.Hit.collider != null)
             {
+                // Check if the collider is a valid building and if it matches the building type
+                // or if it is in a state that allows resuming construction
+
                 return context.Hit.collider.TryGetComponent(out BaseBuilding building)
                     && Building == building.BuildingSO
                     && (building.Progress.State == BuildingProgress.BuildingState.Paused
@@ -21,7 +25,7 @@ namespace RTS_LEARN.Commands
                     );
             }
 
-            return true;
+            return AllRestrictionsPass(context.Hit.point); ;
         }
 
         public override void Handle(CommandContext context)
@@ -32,11 +36,11 @@ namespace RTS_LEARN.Commands
             {
                 builder.ResumeBuilding(building);
             }
-            else
+            else if (AllRestrictionsPass(context.Hit.point))
             {
                 builder.Build(Building, context.Hit.point);
             }
         }
-    }
 
+    }
 }
