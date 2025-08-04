@@ -4,7 +4,7 @@ using UnityEngine;
 namespace RTS_LEARN.Commands
 {
     [CreateAssetMenu(fileName = "Move Action", menuName = "Units/Commands/Move", order = 100)]
-    public class MoveCommand : ActionBase
+    public class MoveCommand : BaseCommand
     {
         [SerializeField] private float radiusMultiplied = 3.5f;
         private int unitsOnLayer = 0;
@@ -47,6 +47,8 @@ namespace RTS_LEARN.Commands
                 radiusOffset += 2 * Mathf.PI / maxUnitsOnLayer; // Adjust the radial offset for the next layer
             }
         }
+
+        public override bool IsLocked(CommandContext context) => false;
     }
 
 }

@@ -12,7 +12,7 @@ namespace RTS_LEARN.UI
 {
     public class RuntimeUI : MonoBehaviour
     {
-        [SerializeField] private ActionsUI actionsUI;
+        [SerializeField] private CommandsUI commandsUI;
         [SerializeField] private BuildingBuildingUI buildingBuildingUI;
 
         HashSet<AbstractCommandable> selectedUnits = new(12);
@@ -23,11 +23,12 @@ namespace RTS_LEARN.UI
             Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
             Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
+            Bus<SupplyEvent>.OnEvent += HandleSupplyChange;
         }
 
         void Start()
         {
-            actionsUI.Disable();
+            commandsUI.Disable();
             buildingBuildingUI.Disable();
         }
 
@@ -36,7 +37,13 @@ namespace RTS_LEARN.UI
             Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
             Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+            Bus<SupplyEvent>.OnEvent -= HandleSupplyChange;
 
+        }
+
+        private void HandleSupplyChange(SupplyEvent evt)
+        {
+            commandsUI.EnableFor(selectedUnits);
         }
 
         private void HandleUnitDeath(UnitDeathEvent evt)
@@ -51,7 +58,7 @@ namespace RTS_LEARN.UI
             if (evt.Unit is AbstractCommandable commandable)
             {
                 selectedUnits.Add(commandable);
-                actionsUI.EnableFor(selectedUnits);
+                commandsUI.EnableFor(selectedUnits);
             }
 
             if (selectedUnits.Count == 1 && evt.Unit is BaseBuilding building)
@@ -72,7 +79,7 @@ namespace RTS_LEARN.UI
         {
             if (selectedUnits.Count > 0)
             {
-                actionsUI.EnableFor(selectedUnits);
+                commandsUI.EnableFor(selectedUnits);
                 if (selectedUnits.Count == 1 && selectedUnits.First() is BaseBuilding building)
                 {
                     buildingBuildingUI.EnableFor(building);
@@ -84,7 +91,7 @@ namespace RTS_LEARN.UI
             }
             else
             {
-                actionsUI.Disable();
+                commandsUI.Disable();
                 buildingBuildingUI.Disable();
             }
         }

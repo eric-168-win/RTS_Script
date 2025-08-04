@@ -11,7 +11,7 @@ using UnityEngine.Events;
 
 namespace RTS_LEARN.UI.Containers
 {
-    public class ActionsUI : MonoBehaviour, IUIElement<HashSet<AbstractCommandable>>
+    public class CommandsUI : MonoBehaviour, IUIElement<HashSet<AbstractCommandable>>
     {
         [SerializeField] private UIActionButton[] actionButtons;
         private void Start()
@@ -38,7 +38,7 @@ namespace RTS_LEARN.UI.Containers
 
         private void RefreshButtons(HashSet<AbstractCommandable> selectedUnits)
         {
-            HashSet<ActionBase> availableCommands = new(9);
+            HashSet<BaseCommand> availableCommands = new(9);
 
             foreach (AbstractCommandable commandable in selectedUnits)
             {
@@ -47,7 +47,7 @@ namespace RTS_LEARN.UI.Containers
 
             for (int i = 0; i < actionButtons.Length; i++)
             {
-                ActionBase actionForSlot = availableCommands.Where(action => action.Slot == i).FirstOrDefault();
+                BaseCommand actionForSlot = availableCommands.Where(action => action.Slot == i).FirstOrDefault();
                 if (actionForSlot != null)
                 {
                     actionButtons[i].EnableFor(actionForSlot, HandleClick(actionForSlot));
@@ -60,9 +60,9 @@ namespace RTS_LEARN.UI.Containers
             }
         }
 
-        private UnityAction HandleClick(ActionBase Action)
+        private UnityAction HandleClick(BaseCommand Action)
         {
-            return () => Bus<ActionSelectedEvent>.Raise(new ActionSelectedEvent(Action));
+            return () => Bus<CommandSelectedEvent>.Raise(new CommandSelectedEvent(Action));
         }
 
     }

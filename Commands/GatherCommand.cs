@@ -6,7 +6,7 @@ using UnityEngine;
 namespace RTS_LEARN.Commands
 {
     [CreateAssetMenu(fileName = "Gather Action", menuName = "Units/Commands/Gather", order = 105)]
-    public class GatherCommand : ActionBase
+    public class GatherCommand : BaseCommand
     {
         [SerializeField] private AbstractUnitSO commandPostSO;
         public override bool CanHandle(CommandContext context)
@@ -35,6 +35,8 @@ namespace RTS_LEARN.Commands
 
         private bool IsGatherableSupplyOrCommandPost(Collider collider) => collider.TryGetComponent(out GatherableSupply _) || IsCommandPost(collider);
         private bool IsCommandPost(Collider collider) => collider.TryGetComponent(out BaseBuilding building) && building.UnitSO.Equals(commandPostSO);
+
+        public override bool IsLocked(CommandContext context) => false;
 
     }
 }

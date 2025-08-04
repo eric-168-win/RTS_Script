@@ -6,7 +6,7 @@ using UnityEngine;
 namespace RTS_LEARN.Commands
 {
     [CreateAssetMenu(fileName = "Build Building", menuName = "Units/Commands/Build Building")]
-    public class BuildBuildingCommand : ActionBase
+    public class BuildBuildingCommand : BaseCommand
     {
         [field: SerializeField] public BuildingSO Building { get; private set; }
 
@@ -42,6 +42,8 @@ namespace RTS_LEARN.Commands
                 builder.Build(Building, context.Hit.point);
             }
         }
+
+        public override bool IsLocked(CommandContext context) => !HasEnoughSupplies();
 
         private bool HasEnoughSupplies() => Building.Cost.Minerals <= Supplies.Minerals && Building.Cost.Gas <= Supplies.Gas;
 

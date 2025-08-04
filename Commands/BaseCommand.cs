@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RTS_LEARN.Commands
 {
-    public abstract class ActionBase : ScriptableObject, ICommand
+    public abstract class BaseCommand : ScriptableObject, ICommand
     {
         [field: SerializeField] public Sprite Icon { get; private set; }
         [field: Range(0, 8)][field: SerializeField] public int Slot { get; private set; }
@@ -12,6 +12,7 @@ namespace RTS_LEARN.Commands
         [field: SerializeField] public BuildingRestrictionSO[] Restrictions { get; private set; }
         public abstract bool CanHandle(CommandContext context);
         public abstract void Handle(CommandContext context);
+        public abstract bool IsLocked(CommandContext context);
 
         public bool AllRestrictionsPass(Vector3 point) =>
               Restrictions.Length == 0 || Restrictions.All(restriction => restriction.CanPlace(point));

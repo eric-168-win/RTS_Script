@@ -3,9 +3,9 @@ using UnityEngine;
 namespace RTS_LEARN.Commands
 {
     [CreateAssetMenu(fileName = "Override Commands", menuName = "Units/Commands/Override Commands", order = 110)]
-    public class OverrideCommandsCommand : ActionBase
+    public class OverrideCommandsCommand : BaseCommand
     {
-        [field: SerializeField] public ActionBase[] Commands { get; private set; }
+        [field: SerializeField] public BaseCommand[] Commands { get; private set; }
 
         public override bool CanHandle(CommandContext context)
         {
@@ -16,5 +16,7 @@ namespace RTS_LEARN.Commands
         {
             context.Commandable.SetCommandOverrides(Commands);
         }
+
+        public override bool IsLocked(CommandContext context) => false;
     }
 }

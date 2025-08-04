@@ -39,7 +39,7 @@ namespace RTS_LEARN.Player
 
         private Vector2 startingMousePosition;
 
-        private ActionBase activeAction;
+        private BaseCommand activeCommand;
         private GameObject ghostInstance;
         private MeshRenderer ghostRenderer;
         private bool wasMouseDownOnUI;
@@ -75,7 +75,7 @@ namespace RTS_LEARN.Player
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
             Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
             Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
-            Bus<ActionSelectedEvent>.OnEvent += HandleActionSelected;
+            Bus<CommandSelectedEvent>.OnEvent += HandleCommandSelected;
      
         }
 
@@ -96,16 +96,16 @@ namespace RTS_LEARN.Player
 
         }
         private void HandleUnitDeselected(UnitDeselectedEvent evt) => selectedUnits.Remove(evt.Unit);
-        private void HandleActionSelected(ActionSelectedEvent evt)
+        private void HandleCommandSelected(CommandSelectedEvent evt)
         {
-            activeAction = evt.Action;
-            if (!activeAction.RequiresClickToActivate)
+            activeCommand = evt.Command;
+            if (!activeCommand.RequiresClickToActivate)
             {
-                ActivateAction(new RaycastHit());
+                ActivateCommand(new RaycastHit());
             }
-            else if (activeAction.GhostPrefab != null)
+            else if (activeCommand.GhostPrefab != null)
             {
-                ghostInstance = Instantiate(activeAction.GhostPrefab);
+                ghostInstance = Instantiate(activeCommand.GhostPrefab);
                 ghostRenderer = ghostInstance.GetComponentInChildren<MeshRenderer>();
             }
         }
@@ -116,7 +116,7 @@ namespace RTS_LEARN.Player
             Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
             Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
             Bus<UnitSpawnEvent>.OnEvent -= HandleUnitSpawned;
-            Bus<ActionSelectedEvent>.OnEvent -= HandleActionSelected;
+            Bus<CommandSelectedEvent>.OnEvent -= HandleCommandSelected;
             Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
 
         }
@@ -140,7 +140,7 @@ namespace RTS_LEARN.Player
             {
                 Destroy(ghostInstance);
                 ghostInstance = null;
-                activeAction = null;
+                activeCommand = null;
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace RTS_LEARN.Player
             if (Physics.Raycast(cameraRay, out RaycastHit hit, float.MaxValue, floorLayers))
             {
                 ghostInstance.transform.position = hit.point;
-                bool allRestrictionsPass = activeAction.AllRestrictionsPass(hit.point);
+                bool allRestrictionsPass = activeCommand.AllRestrictionsPass(hit.point);
 
                 ghostRenderer.material.SetColor(TINT, allRestrictionsPass ? availableToPlaceTintColor : errorTintColor);
                 ghostRenderer.material.SetColor(FRESNEL,
@@ -179,7 +179,7 @@ namespace RTS_LEARN.Player
         private void HandleMouseUp()
         {
             if (!wasMouseDownOnUI
-                && activeAction == null
+                && activeCommand == null
                 && !Keyboard.current.shiftKey.isPressed)
             {
                 DeselectAllUnits();
@@ -195,9 +195,9 @@ namespace RTS_LEARN.Player
 
         private void HandleMouseDrag()
         {
-            if (activeAction != null || wasMouseDownOnUI)
+            if (activeCommand != null || wasMouseDownOnUI)
             {
-                return; // Ignore drag if an action is active or mouse was down on UI
+                return; // Ignore drag if an command is active or mouse was down on UI
             }
 
             Bounds selectionBounds = ResizeSelectionBox();
@@ -250,14 +250,14 @@ namespace RTS_LEARN.Player
             );
         }
 
-        private List<ActionBase> GetAvailableCommands(AbstractUnit unit)
+        private List<BaseCommand> GetAvailableCommands(AbstractUnit unit)
         {
             OverrideCommandsCommand[] overrideCommandsCommands = unit.AvailableCommands
                 .Where(command => command is OverrideCommandsCommand)
                 .Cast<OverrideCommandsCommand>()
                 .ToArray();
 
-            List<ActionBase> allAvailableCommands = new();
+            List<BaseCommand> allAvailableCommands = new();
 
             foreach (OverrideCommandsCommand overrideCommand in overrideCommandsCommands)//hard to understand
             {
@@ -314,23 +314,23 @@ namespace RTS_LEARN.Player
             if (camera == null) { return; }
             Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
 
-            if (activeAction == null
+            if (activeCommand == null
                 && Physics.Raycast(ray, out RaycastHit hit, float.MaxValue
                 /* infinitely long */, /*LayerMask.GetMask("Default")*/ selectableUnitsLayers)
                 && hit.collider.TryGetComponent(out ISelectable selectable))
             {
                 selectable.Select();
             }
-            else if (activeAction != null
+            else if (activeCommand != null
                 && !EventSystem.current.IsPointerOverGameObject()
                 && Physics.Raycast(ray, out hit, float.MaxValue, interactableUnitsLayers | floorLayers))
             {
-                ActivateAction(hit);
+                ActivateCommand(hit);
             }
 
         }
 
-        private void ActivateAction(RaycastHit hit)
+        private void ActivateCommand(RaycastHit hit)
         {
             if (ghostInstance != null)
             {
@@ -346,11 +346,11 @@ namespace RTS_LEARN.Player
             for (int i = 0; i < absCmdables.Count; i++)
             {
                 CommandContext context = new(absCmdables[i], hit, i);
-                Debug.Log($"Handling command: [{activeAction.name}] for [{absCmdables[i].name}] at hit point: {hit.point}");
-                activeAction.Handle(context);
+                Debug.Log($"Handling command: [{activeCommand.name}] for [{absCmdables[i].name}] at hit point: {hit.point}");
+                activeCommand.Handle(context);
             }
 
-            activeAction = null; // Reset active action after handling
+            activeCommand = null; // Reset active command after handling
         }
 
         private void HandlePanning()

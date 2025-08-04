@@ -11,7 +11,7 @@ namespace RTS_LEARN.Units
 {
     public class Worker : AbstractUnit, IBuildingBuilder
     {
-        [SerializeField] private ActionBase CancelBuildingCommand;
+        [SerializeField] private BaseCommand CancelBuildingCommand;
         public bool HasSupplies
         {
             get
@@ -62,7 +62,7 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Ghost", instance);
             graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
 
-            SetCommandOverrides(new ActionBase[] { CancelBuildingCommand });
+            SetCommandOverrides(new BaseCommand[] { CancelBuildingCommand });
             Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
 
             Bus<SupplyEvent>.Raise(new SupplyEvent(-building.Cost.Minerals, building.Cost.MineralsSO));
@@ -79,7 +79,7 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue<GameObject>("Ghost", null);
             graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
 
-            SetCommandOverrides(new ActionBase[] { CancelBuildingCommand });
+            SetCommandOverrides(new BaseCommand[] { CancelBuildingCommand });
             Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
         }
 
@@ -107,7 +107,7 @@ namespace RTS_LEARN.Units
                 Destroy(buildingVariable.Value.gameObject);//must add gameObject Not Just BaseBuilding
             }
 
-            SetCommandOverrides(Array.Empty<ActionBase>());
+            SetCommandOverrides(Array.Empty<BaseCommand>());
             Stop();
         }
 

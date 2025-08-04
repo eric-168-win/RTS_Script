@@ -4,7 +4,7 @@ using UnityEngine;
 namespace RTS_LEARN.Commands
 {
     [CreateAssetMenu(fileName = "Cancel Building", menuName = "Units/Commands/Cancel Building")]
-    public class CancelBuildingCommand : ActionBase
+    public class CancelBuildingCommand : BaseCommand
     {
         public override bool CanHandle(CommandContext context)
         {
@@ -16,6 +16,8 @@ namespace RTS_LEARN.Commands
             IBuildingBuilder buildingBuilder = context.Commandable as IBuildingBuilder;
             buildingBuilder.CancelBuilding();
         }
+
+        public override bool IsLocked(CommandContext context) => false;
     }
 
 }

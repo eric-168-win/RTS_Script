@@ -12,9 +12,9 @@ namespace RTS_LEARN.Units
     {
         [field: SerializeField] public int CurrentHealth { get; private set; }
         [field: SerializeField] public int MaxHealth { get; private set; }
-        [field: SerializeField] public ActionBase[] AvailableCommands { get; private set; }
+        [field: SerializeField] public BaseCommand[] AvailableCommands { get; private set; }
         [SerializeField] private DecalProjector decalProjector;
-        private ActionBase[] initialCommands;
+        private BaseCommand[] initialCommands;
 
         [field: SerializeField] public AbstractUnitSO UnitSO { get; private set; }
 
@@ -49,7 +49,7 @@ namespace RTS_LEARN.Units
             Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this));
         }
 
-        public void SetCommandOverrides(ActionBase[] commands)
+        public void SetCommandOverrides(BaseCommand[] commands)
         {
             if (commands == null || commands.Length == 0)
             {
