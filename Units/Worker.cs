@@ -101,6 +101,9 @@ namespace RTS_LEARN.Units
             if (graphAgent.GetVariable("BuildingUnderConstruction", out BlackboardVariable<BaseBuilding> buildingVariable)
                 && buildingVariable.Value != null)
             {
+                AbstractUnitSO unitSO = buildingVariable.Value.BuildingSO;
+                Bus<SupplyEvent>.Raise(new SupplyEvent(unitSO.Cost.Minerals, unitSO.Cost.MineralsSO));
+                Bus<SupplyEvent>.Raise(new SupplyEvent(unitSO.Cost.Gas, unitSO.Cost.GasSO));
                 Destroy(buildingVariable.Value.gameObject);//must add gameObject Not Just BaseBuilding
             }
 
