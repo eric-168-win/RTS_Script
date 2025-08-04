@@ -13,11 +13,11 @@ namespace RTS_LEARN.UI.Containers
 {
     public class CommandsUI : MonoBehaviour, IUIElement<HashSet<AbstractCommandable>>
     {
-        [SerializeField] private UIActionButton[] actionButtons;
+        [SerializeField] private UICommandButton[] actionButtons;
         private void Start()
         //wait for the UI to be ready
         {
-            foreach (UIActionButton button in actionButtons)
+            foreach (UICommandButton button in actionButtons)
             {
                 button.Disable();
             }
@@ -30,7 +30,7 @@ namespace RTS_LEARN.UI.Containers
 
         public void Disable()
         {
-            foreach (UIActionButton actionButton in actionButtons)
+            foreach (UICommandButton actionButton in actionButtons)
             {
                 actionButton.Disable();
             }

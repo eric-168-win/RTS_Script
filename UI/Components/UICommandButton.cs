@@ -7,7 +7,7 @@ using UnityEngine.UI;
 namespace RTS_LEARN.UI.Components
 {
     [RequireComponent(typeof(Button))]//force to add If not present
-    public class UIActionButton : MonoBehaviour, IUIElement<BaseCommand, UnityAction>
+    public class UICommandButton : MonoBehaviour, IUIElement<BaseCommand, UnityAction>
     {
         [SerializeField] private Image icon;
 
@@ -18,11 +18,11 @@ namespace RTS_LEARN.UI.Components
             button = GetComponent<Button>();
         }
 
-        public void EnableFor(BaseCommand action, UnityAction onClick)
+        public void EnableFor(BaseCommand command, UnityAction onClick)
         {
             button.onClick.RemoveAllListeners();
-            SetIcon(action.Icon);
-            button.interactable = !action.IsLocked(new CommandContext());
+            SetIcon(command.Icon);
+            button.interactable = !command.IsLocked(new CommandContext());
             button.onClick.AddListener(onClick);
         }
 
