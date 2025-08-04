@@ -15,7 +15,8 @@ namespace RTS_LEARN.Units
         [field: SerializeField] public float CurrentQueueStartTime { get; private set; }
         [field: SerializeField] public AbstractUnitSO BuildingUnit { get; private set; }
         [field: SerializeField] public MeshRenderer MainRenderer { get; private set; }
-        [field: SerializeField] public BuildingProgress Progress { get; private set; } = new(
+        [field: SerializeField]
+        public BuildingProgress Progress { get; private set; } = new(
             BuildingProgress.BuildingState.Destroyed, 0, 0
         );
         [field: SerializeField] public BuildingSO BuildingSO { get; private set; }
@@ -53,7 +54,12 @@ namespace RTS_LEARN.Units
         public void BuildUnit(AbstractUnitSO unit)
         {
             if (buildingQueue.Count == MAX_QUEUE_SIZE)
+            {
                 return;
+            }
+            Bus<SupplyEvent>.Raise(new SupplyEvent(-unit.Cost.Minerals, unit.Cost.MineralsSO));
+            Bus<SupplyEvent>.Raise(new SupplyEvent(-unit.Cost.Gas, unit.Cost.GasSO));
+
 
             buildingQueue.Add(unit);
             // Debug.Log("BBB:::QueueSize::  " + QueueSize);

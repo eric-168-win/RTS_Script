@@ -11,8 +11,8 @@ namespace RTS_LEARN.Player
         [SerializeField] private TextMeshProUGUI gasText;
         [SerializeField] private TextMeshProUGUI populationText;
 
-        public static int Minerals { get; private set; }
-        public static int Gas { get; private set; }
+        public static int Minerals { get; private set; } = 5000;
+        public static int Gas { get; private set; }  = 5000;
         public static int Population { get; private set; }
         public static int PopulationLimit { get; private set; }
 

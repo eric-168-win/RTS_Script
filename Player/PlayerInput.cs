@@ -59,8 +59,6 @@ namespace RTS_LEARN.Player
         private static readonly int TINT = Shader.PropertyToID("_Tint");
         private static readonly int FRESNEL = Shader.PropertyToID("_FresnelColor");
 
-        private int minerals = 0;
-        private int gas = 0;
 
         private void Awake()
         {
@@ -78,18 +76,7 @@ namespace RTS_LEARN.Player
             Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
             Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
             Bus<ActionSelectedEvent>.OnEvent += HandleActionSelected;
-            Bus<SupplyEvent>.OnEvent += (evt) =>
-            {
-                if (evt.Supply == mineralsSO)
-                {
-                    minerals += evt.Amount;
-                }
-                else if (evt.Supply == gasSO)
-                {
-                    gas += evt.Amount;
-                }
-                // Debug.Log($"Minerals: {minerals}, Gas: {gas}"); // For debugging purposes
-            };
+     
         }
 
         private void HandleUnitDeath(UnitDeathEvent evt)
@@ -359,6 +346,7 @@ namespace RTS_LEARN.Player
             for (int i = 0; i < absCmdables.Count; i++)
             {
                 CommandContext context = new(absCmdables[i], hit, i);
+                Debug.Log($"Handling command: [{activeAction.name}] for [{absCmdables[i].name}] at hit point: {hit.point}");
                 activeAction.Handle(context);
             }
 
