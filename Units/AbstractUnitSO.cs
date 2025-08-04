@@ -1,4 +1,4 @@
-using RTS_LEARNS.Units;
+using RTS_LEARN.Units;
 using UnityEngine;
 
 namespace RTS_LEARN.Units

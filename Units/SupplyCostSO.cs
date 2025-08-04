@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace RTS_LEARNS.Units
+namespace RTS_LEARN.Units
 {
     [CreateAssetMenu(fileName = "Supply Cost", menuName = "Supply Cost", order = 5)]
     public class SupplyCostSO : ScriptableObject
