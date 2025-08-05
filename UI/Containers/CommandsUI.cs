@@ -6,6 +6,7 @@ using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
 using RTS_LEARN.UI.Components;
 using RTS_LEARN.Units;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -42,7 +43,11 @@ namespace RTS_LEARN.UI.Containers
 
             foreach (AbstractCommandable commandable in selectedUnits)
             {
-                availableCommands.UnionWith(commandable.AvailableCommands);
+                if (commandable.AvailableCommands != null)
+                {
+                    availableCommands.AddRange(commandable.AvailableCommands);
+                }
+
             }
 
             for (int i = 0; i < actionButtons.Length; i++)

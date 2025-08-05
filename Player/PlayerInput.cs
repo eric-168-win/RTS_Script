@@ -347,7 +347,7 @@ namespace RTS_LEARN.Player
             for (int i = 0; i < absCmdables.Count; i++)
             {
                 CommandContext context = new(absCmdables[i], hit, i);
-                Debug.Log($"Handling command: [{activeCommand.name}] for [{absCmdables[i].name}] at hit point: {hit.point}");
+                // Debug.Log($"Handling command: [{activeCommand.name}] for [{absCmdables[i].name}] at hit point: {hit.point}");
                 activeCommand.Handle(context);
             }
 

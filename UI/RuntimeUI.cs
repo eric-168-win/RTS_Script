@@ -13,7 +13,7 @@ namespace RTS_LEARN.UI
     public class RuntimeUI : MonoBehaviour
     {
         [SerializeField] private CommandsUI commandsUI;
-        [SerializeField] private BuildingBuildingUI buildingBuildingUI;
+        [SerializeField] private BuildingSelectedUI buildingSelectedUI;
         [SerializeField] private UnitIconUI unitIconUI;
         [SerializeField] private SingleUnitSelectedUI singleUnitSelectedUI;
         HashSet<AbstractCommandable> selectedUnits = new(12);
@@ -29,9 +29,9 @@ namespace RTS_LEARN.UI
         void Start()
         {
             commandsUI.Disable();
-            buildingBuildingUI.Disable();
             unitIconUI.Disable();
             singleUnitSelectedUI.Disable();
+            buildingSelectedUI.Disable();
         }
 
         void OnDestroy()
@@ -82,28 +82,31 @@ namespace RTS_LEARN.UI
                 {
                     AbstractCommandable commandable = selectedUnits.First();
                     unitIconUI.EnableFor(commandable);
+
                     singleUnitSelectedUI.EnableFor(commandable);
 
                     if (commandable is BaseBuilding building)
                     {
-                        buildingBuildingUI.EnableFor(building);
+                        singleUnitSelectedUI.Disable();
+                        buildingSelectedUI.EnableFor(building);
                     }
                     else
                     {
-                        buildingBuildingUI.Disable();
+                        singleUnitSelectedUI.EnableFor(commandable);
+                        buildingSelectedUI.Disable();
                     }
                 }
                 else
                 {
                     unitIconUI.Disable();
                     singleUnitSelectedUI.Disable();
-                    buildingBuildingUI.Disable();
+                    buildingSelectedUI.Disable();
                 }
             }
             else
             {
                 commandsUI.Disable();
-                buildingBuildingUI.Disable();
+                buildingSelectedUI.Disable();
                 unitIconUI.Disable();
                 singleUnitSelectedUI.Disable();
             }

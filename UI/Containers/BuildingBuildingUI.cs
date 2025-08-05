@@ -46,11 +46,12 @@ namespace RTS_LEARN.UI.Containers
             {
                 StartCoroutine(UpdateUnitProgress());
             }
-            else if (unitsInQueue.Length == 0)
+
+            if (building != null)
             {
-                progressBar.SetProgress(0);
+                SetupUnitButtons();
             }
-            SetupUnitButtons();
+
         }
 
         public void Disable()
@@ -59,7 +60,6 @@ namespace RTS_LEARN.UI.Containers
             {
                 building.OnQueueUpdated -= HandleQueueUpdated;
             }
-
             gameObject.SetActive(false);
             building = null;
             buildCoroutine = null;
