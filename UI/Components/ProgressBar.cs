@@ -26,17 +26,6 @@ namespace RTS_LEARN.UI.Components
             maskParentRectTransform = mask.parent.GetComponent<RectTransform>();
         }
 
-        // public void SetProgress(float progress)
-        // {
-        //     Vector2 parentSize = maskParentRectTransform.sizeDelta;
-        //     Vector2 targetSize = parentSize;
-
-        //     targetSize.x *= Mathf.Clamp01(progress);
-
-        //     mask.offsetMin = Vector2.zero;//starting from the top left corner
-        //     mask.offsetMax = targetSize - parentSize;
-        // }
-
         public void SetProgress(float progress)
         {
             Vector2 parentSize = maskParentRectTransform.sizeDelta;
@@ -49,5 +38,17 @@ namespace RTS_LEARN.UI.Components
 
 
         }
+
+        // public void SetProgress(float progress)
+        // {
+        //     Vector2 parentSize = maskParentRectTransform.sizeDelta;
+        //     Vector2 targetSize = parentSize;
+
+        //     targetSize.x *= Mathf.Clamp01(progress);
+
+        //     mask.offsetMin = Vector2.zero;//starting from the top left corner
+        //     mask.offsetMax = targetSize - parentSize;
+        // }
+
     }
 }

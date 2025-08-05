@@ -15,8 +15,7 @@ namespace RTS_LEARN.Units
         [field: SerializeField] public float CurrentQueueStartTime { get; private set; }
         [field: SerializeField] public AbstractUnitSO BuildingUnit { get; private set; }
         [field: SerializeField] public MeshRenderer MainRenderer { get; private set; }
-        [field: SerializeField]
-        public BuildingProgress Progress { get; private set; } = new(
+        [field: SerializeField] public BuildingProgress Progress { get; private set; } = new(
             BuildingProgress.BuildingState.Destroyed, 0, 0
         );
         [field: SerializeField] public BuildingSO BuildingSO { get; private set; }
@@ -97,16 +96,6 @@ namespace RTS_LEARN.Units
             else
             {
                 OnQueueUpdated?.Invoke(buildingQueue.ToArray());
-            }
-        }
-
-        public void ShowGhostVisuals()
-        {
-            if (MainRenderer != null)
-            {
-                // Debug.Log("1111 " + BuildingSO.PlacementMaterial.name);
-                MainRenderer.material = BuildingSO.PlacementMaterial; //=> override in Awake();
-                MainRenderer = null;
             }
         }
 

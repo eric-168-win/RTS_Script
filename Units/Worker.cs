@@ -57,8 +57,6 @@ namespace RTS_LEARN.Units
                 Debug.LogError($"Missing BaseBuilding on Prefab for BuildingSO \"{building.name}\"! Cannot build!");
                 return null;
             }
-            baseBuildingInGhost.ShowGhostVisuals();
-
             // set up blackboard to build!
             graphAgent.SetVariableValue("BuildingSO", building);
             graphAgent.SetVariableValue("TargetLocation", targetLocation);
