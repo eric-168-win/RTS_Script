@@ -14,9 +14,9 @@ namespace RTS_LEARN.UI
     {
         [SerializeField] private CommandsUI commandsUI;
         [SerializeField] private BuildingBuildingUI buildingBuildingUI;
-
+        [SerializeField] private UnitIconUI unitIconUI;
+        [SerializeField] private SingleUnitSelectedUI singleUnitSelectedUI;
         HashSet<AbstractCommandable> selectedUnits = new(12);
-
 
         void Awake()
         {
@@ -30,6 +30,8 @@ namespace RTS_LEARN.UI
         {
             commandsUI.Disable();
             buildingBuildingUI.Disable();
+            unitIconUI.Disable();
+            singleUnitSelectedUI.Disable();
         }
 
         void OnDestroy()
@@ -52,20 +54,15 @@ namespace RTS_LEARN.UI
             RefreshUI();
         }
 
-
         private void HandleUnitSelected(UnitSelectedEvent evt)
         {
             if (evt.Unit is AbstractCommandable commandable)
             {
                 selectedUnits.Add(commandable);
-                commandsUI.EnableFor(selectedUnits);
-            }
-
-            if (selectedUnits.Count == 1 && evt.Unit is BaseBuilding building)
-            {
-                buildingBuildingUI.EnableFor(building);
+                RefreshUI();
             }
         }
+
         private void HandleUnitDeselected(UnitDeselectedEvent evt)
         {
             if (evt.Unit is AbstractCommandable commandable)
@@ -80,12 +77,26 @@ namespace RTS_LEARN.UI
             if (selectedUnits.Count > 0)
             {
                 commandsUI.EnableFor(selectedUnits);
-                if (selectedUnits.Count == 1 && selectedUnits.First() is BaseBuilding building)
+
+                if (selectedUnits.Count == 1)
                 {
-                    buildingBuildingUI.EnableFor(building);
+                    AbstractCommandable commandable = selectedUnits.First();
+                    unitIconUI.EnableFor(commandable);
+                    singleUnitSelectedUI.EnableFor(commandable);
+
+                    if (commandable is BaseBuilding building)
+                    {
+                        buildingBuildingUI.EnableFor(building);
+                    }
+                    else
+                    {
+                        buildingBuildingUI.Disable();
+                    }
                 }
                 else
                 {
+                    unitIconUI.Disable();
+                    singleUnitSelectedUI.Disable();
                     buildingBuildingUI.Disable();
                 }
             }
@@ -93,9 +104,11 @@ namespace RTS_LEARN.UI
             {
                 commandsUI.Disable();
                 buildingBuildingUI.Disable();
+                unitIconUI.Disable();
+                singleUnitSelectedUI.Disable();
             }
         }
 
-    }
 
+    }
 }
