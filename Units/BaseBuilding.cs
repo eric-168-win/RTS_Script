@@ -15,7 +15,8 @@ namespace RTS_LEARN.Units
         [field: SerializeField] public float CurrentQueueStartTime { get; private set; }
         [field: SerializeField] public AbstractUnitSO BuildingUnit { get; private set; }
         [field: SerializeField] public MeshRenderer MainRenderer { get; private set; }
-        [field: SerializeField] public BuildingProgress Progress { get; private set; } = new(
+        [field: SerializeField]
+        public BuildingProgress Progress { get; private set; } = new(
             BuildingProgress.BuildingState.Destroyed, 0, 0
         );
         [field: SerializeField] public BuildingSO BuildingSO { get; private set; }
@@ -35,6 +36,7 @@ namespace RTS_LEARN.Units
         private void Awake()
         {
             BuildingSO = UnitSO as BuildingSO;
+            MaxHealth = BuildingSO.Health;
         }
 
         protected override void Start()
@@ -102,15 +104,21 @@ namespace RTS_LEARN.Units
 
         public void StartBuilding(IBuildingBuilder buildingBuilder)
         {
+            Awake();
             unitBuildingThis = buildingBuilder;
             MainRenderer.material = BuildingSO.PlacementMaterial;
-            Debug.Log("StartBuilding called for 11111" + BuildingSO.PlacementMaterial.name);
+            Debug.Log("On The Ground ::: " + BuildingSO.PlacementMaterial.name);
 
             Progress = new BuildingProgress(
                 BuildingProgress.BuildingState.Building,
                 Time.time - BuildingSO.BuildTime * Progress.Progress,
                 Progress.Progress
             );
+
+            if (Progress.Progress == 0)
+            {
+                Heal(1);
+            }
 
             //don't want to have duplicate event handlers
             Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;

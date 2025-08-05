@@ -20,12 +20,14 @@ namespace RTS_LEARN.Units
         {
             agent = GetComponent<NavMeshAgent>();
             graphAgent = GetComponent<BehaviorGraphAgent>();
+            graphAgent.SetVariableValue("Command", UnitCommands.Stop);
         }
         protected override void Start()
         {
             base.Start();
+            CurrentHealth = UnitSO.Health;
+            MaxHealth = UnitSO.Health;
             Bus<UnitSpawnEvent>.Raise(new UnitSpawnEvent(this));
-            graphAgent.SetVariableValue("Command", UnitCommands.Stop);
 
         }
 
