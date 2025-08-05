@@ -5,11 +5,11 @@ namespace RTS_LEARN.Event
 {
     public struct BuildingSpawnEvent : IEvent
     {
-        public AbstractUnit Unit { get; private set; }
+        public BaseBuilding Building { get; private set; }
 
-        public BuildingSpawnEvent(AbstractUnit unit)
+        public BuildingSpawnEvent(BaseBuilding building)
         {
-            Unit = unit;
+            Building = building;
         }
     }
 }

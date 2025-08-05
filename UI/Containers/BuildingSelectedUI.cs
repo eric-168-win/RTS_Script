@@ -1,3 +1,5 @@
+using RTS_LEARN.Event;
+using RTS_LEARN.EventBus;
 using RTS_LEARN.Units;
 using UnityEngine;
 
@@ -27,6 +29,7 @@ namespace RTS_LEARN.UI.Containers
                 buildingUnderConstructionUI.EnableFor(building);
                 buildingBuildingUI.Disable();
                 singleUnitSelectedUI.Disable();
+                Bus<BuildingSpawnEvent>.OnEvent += HandleBuildingSpawn;
             }
         }
 
@@ -35,7 +38,8 @@ namespace RTS_LEARN.UI.Containers
             buildingBuildingUI.Disable();
             singleUnitSelectedUI.Disable();
             buildingUnderConstructionUI.Disable();
-            
+            Bus<BuildingSpawnEvent>.OnEvent -= HandleBuildingSpawn;
+
             if (selectedBuilding != null)
             {
                 selectedBuilding.OnQueueUpdated -= OnBuildingQueueUpdated;
@@ -56,5 +60,17 @@ namespace RTS_LEARN.UI.Containers
                 singleUnitSelectedUI.Disable();
             }
         }
+
+
+        private void HandleBuildingSpawn(BuildingSpawnEvent evt)
+        {
+            if (selectedBuilding == evt.Building)
+            {
+                selectedBuilding.OnQueueUpdated -= OnBuildingQueueUpdated;
+                OnBuildingQueueUpdated();
+                buildingUnderConstructionUI.Disable();
+            }
+        }
+
     }
 }

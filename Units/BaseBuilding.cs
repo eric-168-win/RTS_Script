@@ -49,6 +49,7 @@ namespace RTS_LEARN.Units
             Progress = new BuildingProgress(BuildingProgress.BuildingState.Completed, Progress.StartTime, 1);
             unitBuildingThis = null;
             Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+            Bus<BuildingSpawnEvent>.Raise(new BuildingSpawnEvent(this));
         }
 
         public void BuildUnit(AbstractUnitSO unit)
