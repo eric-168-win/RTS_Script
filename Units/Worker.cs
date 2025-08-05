@@ -52,11 +52,12 @@ namespace RTS_LEARN.Units
             GameObject instance = Instantiate(building.Prefab, targetLocation, Quaternion.identity);
             instance.name = "buggy_" + building.name;
 
-            if (!instance.TryGetComponent(out BaseBuilding _1))
+            if (!instance.TryGetComponent(out BaseBuilding baseBuildingInGhost))
             {
                 Debug.LogError($"Missing BaseBuilding on Prefab for BuildingSO \"{building.name}\"! Cannot build!");
                 return null;
             }
+            baseBuildingInGhost.ShowGhostVisuals();
 
             // set up blackboard to build!
             graphAgent.SetVariableValue("BuildingSO", building);
@@ -65,8 +66,6 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
 
             SetCommandOverrides(new BaseCommand[] { CancelBuildingCommand });
-            Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
-
             Bus<SupplyEvent>.Raise(new SupplyEvent(-building.Cost.Minerals, building.Cost.MineralsSO));
             Bus<SupplyEvent>.Raise(new SupplyEvent(-building.Cost.Gas, building.Cost.GasSO));
 

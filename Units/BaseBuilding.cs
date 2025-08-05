@@ -45,6 +45,7 @@ namespace RTS_LEARN.Units
             if (MainRenderer != null)
             {
                 MainRenderer.material = primaryMaterial;
+                // Debug.Log("0000 -> find 1111 " + BuildingSO.PlacementMaterial.name);
             }
             Progress = new BuildingProgress(BuildingProgress.BuildingState.Completed, Progress.StartTime, 1);
             unitBuildingThis = null;
@@ -99,11 +100,21 @@ namespace RTS_LEARN.Units
             }
         }
 
+        public void ShowGhostVisuals()
+        {
+            if (MainRenderer != null)
+            {
+                // Debug.Log("1111 " + BuildingSO.PlacementMaterial.name);
+                MainRenderer.material = BuildingSO.PlacementMaterial; //=> override in Awake();
+                MainRenderer = null;
+            }
+        }
+
         public void StartBuilding(IBuildingBuilder buildingBuilder)
         {
             unitBuildingThis = buildingBuilder;
             MainRenderer.material = BuildingSO.PlacementMaterial;
-            Debug.Log(":::::: " + BuildingSO.PlacementMaterial.name + " :::::::");
+            Debug.Log("StartBuilding called for 11111" + BuildingSO.PlacementMaterial.name);
 
             Progress = new BuildingProgress(
                 BuildingProgress.BuildingState.Building,
