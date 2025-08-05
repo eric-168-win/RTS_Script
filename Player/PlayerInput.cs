@@ -106,6 +106,7 @@ namespace RTS_LEARN.Player
             else if (activeCommand.GhostPrefab != null)
             {
                 ghostInstance = Instantiate(activeCommand.GhostPrefab);
+                ghostInstance.name = "moving_Instance";
                 ghostRenderer = ghostInstance.GetComponentInChildren<MeshRenderer>();
             }
         }

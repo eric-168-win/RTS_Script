@@ -103,6 +103,7 @@ namespace RTS_LEARN.Units
         {
             unitBuildingThis = buildingBuilder;
             MainRenderer.material = BuildingSO.PlacementMaterial;
+            Debug.Log(":::::: " + BuildingSO.PlacementMaterial.name + " :::::::");
 
             Progress = new BuildingProgress(
                 BuildingProgress.BuildingState.Building,

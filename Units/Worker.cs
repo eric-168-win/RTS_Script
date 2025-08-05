@@ -50,6 +50,8 @@ namespace RTS_LEARN.Units
         public GameObject Build(BuildingSO building, Vector3 targetLocation)
         {
             GameObject instance = Instantiate(building.Prefab, targetLocation, Quaternion.identity);
+            instance.name = "buggy_" + building.name;
+
             if (!instance.TryGetComponent(out BaseBuilding _1))
             {
                 Debug.LogError($"Missing BaseBuilding on Prefab for BuildingSO \"{building.name}\"! Cannot build!");

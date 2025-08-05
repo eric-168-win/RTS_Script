@@ -8,7 +8,7 @@ namespace RTS_LEARN.Commands
     [CreateAssetMenu(fileName = "Build Building", menuName = "Units/Commands/Build Building")]
     public class BuildBuildingCommand : BaseCommand
     {
-        [field: SerializeField] public BuildingSO Building { get; private set; }
+        [field: SerializeField] public BuildingSO BuildingSO { get; private set; }
 
         public override bool CanHandle(CommandContext context)
         {
@@ -20,7 +20,7 @@ namespace RTS_LEARN.Commands
                 // or if it is in a state that allows resuming construction
 
                 return context.Hit.collider.TryGetComponent(out BaseBuilding building)
-                    && Building == building.BuildingSO
+                    && BuildingSO == building.BuildingSO
                     && (building.Progress.State == BuildingProgress.BuildingState.Paused
                         || building.Progress.State == BuildingProgress.BuildingState.Destroyed
                     );
@@ -39,13 +39,13 @@ namespace RTS_LEARN.Commands
             }
             else if (HasEnoughSupplies() && AllRestrictionsPass(context.Hit.point))
             {
-                builder.Build(Building, context.Hit.point);
+                builder.Build(BuildingSO, context.Hit.point);
             }
         }
 
         public override bool IsLocked(CommandContext context) => !HasEnoughSupplies();
 
-        private bool HasEnoughSupplies() => Building.Cost.Minerals <= Supplies.Minerals && Building.Cost.Gas <= Supplies.Gas;
+        private bool HasEnoughSupplies() => BuildingSO.Cost.Minerals <= Supplies.Minerals && BuildingSO.Cost.Gas <= Supplies.Gas;
 
 
     }
