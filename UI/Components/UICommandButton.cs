@@ -1,5 +1,6 @@
 
 using RTS_LEARN.Commands;
+using RTS_LEARN.Units;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
@@ -17,11 +18,16 @@ namespace RTS_LEARN.UI.Components
         [SerializeField] private Image icon;
         [SerializeField] private Tooltip tooltip;
 
+        private bool isActive;
+        private RectTransform rectTransform;
+
         private Button button;
 
         private void Awake()
         {
             button = GetComponent<Button>();
+            rectTransform = GetComponent<RectTransform>();
+            Disable();
         }
 
         public void EnableFor(BaseCommand command, UnityAction onClick)
@@ -30,10 +36,11 @@ namespace RTS_LEARN.UI.Components
             SetIcon(command.Icon);
             button.interactable = !command.IsLocked(new CommandContext());
             button.onClick.AddListener(onClick);
+            isActive = true;
 
             if (tooltip != null)
             {
-                tooltip.SetText(command.name);
+                tooltip.SetText(GetTooltipText(command));
             }
         }
 
@@ -42,11 +49,7 @@ namespace RTS_LEARN.UI.Components
             SetIcon(null);
             button.interactable = false;
             button.onClick.RemoveAllListeners();
-
-            if (tooltip != null)
-            {
-                tooltip.Hide();
-            }
+            isActive = false;
             CancelInvoke();
         }
 
@@ -67,7 +70,10 @@ namespace RTS_LEARN.UI.Components
         void IPointerEnterHandler.OnPointerEnter(PointerEventData _)
         {
             // Invoke("ShowTooltip", 0.5f); //hardcoded string, prone to errors
-            Invoke(nameof(ShowTooltip), 0.5f);
+            if (isActive)
+            {
+                Invoke(nameof(ShowTooltip), tooltip.HoverDelay);
+            }
         }
 
         private void ShowTooltip()
@@ -75,8 +81,11 @@ namespace RTS_LEARN.UI.Components
             if (tooltip != null)
             {
                 tooltip.Show();
+                tooltip.RectTransform.position = new Vector2(
+                    rectTransform.position.x + rectTransform.rect.width / 2f,
+                    rectTransform.position.y + rectTransform.rect.height / 2f
+                );
             }
-
         }
 
         void IPointerExitHandler.OnPointerExit(PointerEventData _)
@@ -85,8 +94,39 @@ namespace RTS_LEARN.UI.Components
             {
                 tooltip.Hide();
             }
-            CancelInvoke();//cancel all pending invocations
+            CancelInvoke();
+            //cancel all pending invocations
             // CancelInvoke(nameof(ShowTooltip));
         }
+
+        private string GetTooltipText(BaseCommand command)
+        {
+            string tooltipText = command.Name + "\n";
+
+            SupplyCostSO supplyCost = null;
+            if (command is BuildUnitCommand unitCommand)
+            {
+                supplyCost = unitCommand.Unit.Cost;
+            }
+            else if (command is BuildBuildingCommand buildingCommand)
+            {
+                supplyCost = buildingCommand.BuildingSO.Cost;
+            }
+
+            if (supplyCost != null)
+            {
+                if (supplyCost.Minerals > 0)
+                {
+                    tooltipText += $"{supplyCost.Minerals} Minerals.";
+                }
+                if (supplyCost.Gas > 0)
+                {
+                    tooltipText += $"{supplyCost.Gas} Gas.";
+                }
+            }
+
+            return tooltipText;
+        }
+
     }
 }
