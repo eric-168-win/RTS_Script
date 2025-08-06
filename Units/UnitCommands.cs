@@ -10,7 +10,6 @@ namespace RTS_LEARN.Units
         Move,
         Gather,
         ReturnSupplies,
-        BuildBuilding,
-        ResumeBuilding,
+        BuildBuilding
     }
 }
