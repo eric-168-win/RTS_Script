@@ -60,9 +60,9 @@ namespace RTS_LEARN.Units
                     break;
                 case BuildingEventType.Cancel:
                 case BuildingEventType.Abort:
+                case BuildingEventType.Completed:
                     SetCommandOverrides(null);
                     break;
-                case BuildingEventType.Completed:
                 default:
                     break;
             }
@@ -140,6 +140,22 @@ namespace RTS_LEARN.Units
 
             SetCommandOverrides(Array.Empty<BaseCommand>());
             Stop();
+        }
+
+        public override void Deselect()
+        {
+            if (decalProjector != null)
+            {
+                decalProjector.gameObject.SetActive(false);
+            }
+
+            IsSelected = false;
+            if (!IsBuilding)
+            {
+                SetCommandOverrides(null);
+            }
+
+            Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this));
         }
 
     }

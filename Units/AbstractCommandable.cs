@@ -14,7 +14,7 @@ namespace RTS_LEARN.Units
         [field: SerializeField] public int CurrentHealth { get; protected set; }
         [field: SerializeField] public int MaxHealth { get; protected set; }
         [field: SerializeField] public BaseCommand[] AvailableCommands { get; private set; }
-        [SerializeField] private DecalProjector decalProjector;
+        [SerializeField] protected DecalProjector decalProjector;
         private BaseCommand[] initialCommands;
 
         [field: SerializeField] public AbstractUnitSO UnitSO { get; private set; }

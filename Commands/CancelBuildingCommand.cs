@@ -8,7 +8,8 @@ namespace RTS_LEARN.Commands
     {
         public override bool CanHandle(CommandContext context)
         {
-            return context.Commandable is IBuildingBuilder;
+            return context.Commandable is IBuildingBuilder
+            && context.Button.ToString() == "Left";
         }
 
         public override void Handle(CommandContext context)
