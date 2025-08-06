@@ -11,6 +11,9 @@ namespace RTS_LEARN.Units
 {
     public class Worker : AbstractUnit, IBuildingBuilder
     {
+        public bool IsBuilding =>
+            graphAgent.GetVariable("Command", out BlackboardVariable<UnitCommands> command)
+            && command.Value == UnitCommands.BuildBuilding;
         [SerializeField] private BaseCommand CancelBuildingCommand;
         public bool HasSupplies
         {

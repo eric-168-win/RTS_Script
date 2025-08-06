@@ -9,6 +9,7 @@ using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.LowLevel;
 
 
 namespace RTS_LEARN.Player
@@ -296,12 +297,16 @@ namespace RTS_LEARN.Player
 
                     for (int i = 0; i < abstractUnits.Count; i++)
                     {
-                        CommandContext context = new(abstractUnits[i], hit, i);
+                        CommandContext context = new(abstractUnits[i], hit, i, MouseButton.Right);
                         foreach (ICommand command in GetAvailableCommands(abstractUnits[i]))
                         {
                             if (command.CanHandle(context))
                             {
                                 command.Handle(context);
+                                if (command.IsSingleUnitCommand)
+                                {
+                                    return;
+                                }
                                 break;
                             }
                         }
@@ -347,8 +352,16 @@ namespace RTS_LEARN.Player
             for (int i = 0; i < absCmdables.Count; i++)
             {
                 CommandContext context = new(absCmdables[i], hit, i);
-                // Debug.Log($"Handling command: [{activeCommand.name}] for [{absCmdables[i].name}] at hit point: {hit.point}");
-                activeCommand.Handle(context);
+                Debug.Log($"Handling command: [{activeCommand.name}] for [{absCmdables[i].name}] at hit point: {hit.point}");
+                if (activeCommand.CanHandle(context))
+                {
+                    activeCommand.Handle(context);
+                    if (activeCommand.IsSingleUnitCommand)
+                    {
+                        break;
+                    }
+                }
+
             }
 
             activeCommand = null; // Reset active command after handling

@@ -11,6 +11,7 @@ namespace RTS_LEARN.Commands
         [field: SerializeField] public bool RequiresClickToActivate { get; private set; } = true;
         [field: SerializeField] public GameObject GhostPrefab { get; private set; }
         [field: SerializeField] public BuildingRestrictionSO[] Restrictions { get; private set; }
+        [field: SerializeField] public bool IsSingleUnitCommand { get; private set; }
         public abstract bool CanHandle(CommandContext context);
         public abstract void Handle(CommandContext context);
         public abstract bool IsLocked(CommandContext context);
