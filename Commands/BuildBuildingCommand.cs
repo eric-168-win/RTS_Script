@@ -30,13 +30,13 @@ namespace RTS_LEARN.Commands
         public override void Handle(CommandContext context)
         {
             IBuildingBuilder builder = (IBuildingBuilder)context.Commandable;
-            if (context.Hit.collider != null
-                && context.Hit.collider.TryGetComponent(out BaseBuilding building))
+            if (context.Hit.collider != null && context.Hit.collider.TryGetComponent(out BaseBuilding building))
             {
                 builder.ResumeBuilding(building);
             }
-            else if (HasEnoughSupplies() && AllRestrictionsPass(context.Hit.point))
+            else if (HasEnoughSupplies() && AllRestrictionsPass(context.Hit.point) && context.Button.ToString() != "Right")
             {
+                Debug.Log($"Building {BuildingSO.name} at {context.Hit.point}:::: {context.Button}");
                 builder.Build(BuildingSO, context.Hit.point);
             }
         }

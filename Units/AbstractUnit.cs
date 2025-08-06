@@ -34,6 +34,7 @@ namespace RTS_LEARN.Units
         public void MoveTo(Vector3 position)
         {
             // agent.SetDestination(position);
+            SetCommandOverrides(null); // Clear commands
             graphAgent.SetVariableValue("TargetLocation", position);
             graphAgent.SetVariableValue("Command", UnitCommands.Move);//will abort current execution => place after TargetLocation
 
@@ -42,6 +43,7 @@ namespace RTS_LEARN.Units
         public void Stop()
         {
             // graphAgent.SetVariableValue("TargetLocation", transform.position);
+            SetCommandOverrides(null); // Clear commands
             graphAgent.SetVariableValue("Command", UnitCommands.Stop);
         }
 

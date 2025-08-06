@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using RTS_LEARN.Behavior;
 using RTS_LEARN.Commands;
 using RTS_LEARN.Environment;
@@ -35,6 +36,36 @@ namespace RTS_LEARN.Units
             {
                 eventChannelVariable.Value.Event += HandleGatherSupplies;
             }
+
+            if (graphAgent.GetVariable("BuildingEventChannel", out BlackboardVariable<BuildingEventChannel> buildingEventChannelVariable))
+            {
+                buildingEventChannelVariable.Value.Event += HandleBuildingEvent;
+            }
+        }
+
+        private void HandleBuildingEvent(GameObject self, BuildingEventType eventType, BaseBuilding building)
+        {
+            switch (eventType)
+            {
+                case BuildingEventType.ArrivedAt:
+                    if (building != null && building.Progress.State == BuildingProgress.BuildingState.Building)
+                    {
+                        Stop();
+                        break;
+                    }
+                    SetCommandOverrides(new BaseCommand[] { CancelBuildingCommand });
+                    break;
+                case BuildingEventType.Begin:
+                    SetCommandOverrides(new BaseCommand[] { CancelBuildingCommand });
+                    break;
+                case BuildingEventType.Cancel:
+                case BuildingEventType.Abort:
+                    SetCommandOverrides(null);
+                    break;
+                case BuildingEventType.Completed:
+                default:
+                    break;
+            }
         }
 
         private void HandleGatherSupplies(GameObject self, int amount, SupplySO supply)
@@ -57,7 +88,7 @@ namespace RTS_LEARN.Units
 
             if (!instance.TryGetComponent(out BaseBuilding baseBuildingInGhost))
             {
-                Debug.LogError($"Missing BaseBuilding on Prefab for BuildingSO \"{building.name}\"! Cannot build!");
+                UnityEngine.Debug.Log($"Missing BaseBuilding on Prefab for BuildingSO \"{building.name}\"! Cannot build!");
                 return null;
             }
             // set up blackboard to build!
@@ -81,8 +112,6 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue<GameObject>("Ghost", null);
             graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
 
-            SetCommandOverrides(new BaseCommand[] { CancelBuildingCommand });
-            Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
         }
 
 
