@@ -15,7 +15,7 @@ namespace RTS_LEARN.Commands
         {
             if (context.Commandable is not IBuildingBuilder buildingBuilder || buildingBuilder.IsBuilding) return false;
 
-            if (context.Hit.collider != null && context.Button.Equals(MouseButton.Right))//resumming
+            if (context.Hit.collider != null && context.Button.ToString() == "Right")//resumming
             {
                 return context.Hit.collider.TryGetComponent(out BaseBuilding building)
                     && BuildingSO == building.BuildingSO
