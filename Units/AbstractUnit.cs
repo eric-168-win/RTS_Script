@@ -9,7 +9,7 @@ using UnityEngine.AI;
 namespace RTS_LEARN.Units
 {
     [RequireComponent(typeof(NavMeshAgent), typeof(BehaviorGraphAgent))] // Ensures NavMeshAgent is attached
-    public abstract class AbstractUnit : AbstractCommandable, IMoveable
+    public abstract class AbstractUnit : AbstractCommandable, IMoveable, IAttacker
     {
 
         public float AgentRadius => agent.radius; //meaning only Getter// expression bodied property
@@ -80,6 +80,12 @@ namespace RTS_LEARN.Units
         //     graphAgent.SetVariableValue("NearbyEnemies",
         //     DamageableSensor.Damageables.ConvertAll(damageable => damageable.Transform.gameObject));
         // }
+
+        public void Attack(IDamageable damageable)
+        {
+            // set some graph variables here!
+            Debug.Log($"{name} should attack {damageable.Transform.name}");
+        }
 
     }
 }
