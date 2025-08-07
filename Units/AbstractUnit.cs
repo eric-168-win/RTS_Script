@@ -11,8 +11,8 @@ namespace RTS_LEARN.Units
     {
 
         public float AgentRadius => agent.radius; //meaning only Getter// expression bodied property
+        [SerializeField] private DamageableSensor DamageableSensor;
         private NavMeshAgent agent;
-
         protected BehaviorGraphAgent graphAgent;
 
 
@@ -28,6 +28,12 @@ namespace RTS_LEARN.Units
             CurrentHealth = UnitSO.Health;
             MaxHealth = UnitSO.Health;
             Bus<UnitSpawnEvent>.Raise(new UnitSpawnEvent(this));
+
+            if (DamageableSensor != null)
+            {
+                DamageableSensor.OnUnitEnter += HandleUnitEnter;
+                DamageableSensor.OnUnitExit += HandleUnitExit;
+            }
 
         }
 
@@ -50,6 +56,16 @@ namespace RTS_LEARN.Units
         private void OnDestroy()
         {
             Bus<UnitDeathEvent>.Raise(new UnitDeathEvent(this));
+        }
+
+        private void HandleUnitEnter(IDamageable damageable)
+        {
+            Debug.Log($"Detected unit enter! {DamageableSensor.Damageables.Count} nearby damageables!");
+        }
+
+        private void HandleUnitExit(IDamageable damageable)
+        {
+            Debug.Log($"Detected unit exit! {DamageableSensor.Damageables.Count} nearby damageables!");
         }
 
     }
