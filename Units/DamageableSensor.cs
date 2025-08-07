@@ -5,9 +5,10 @@ using UnityEngine;
 
 namespace RTS_LEARN.Units
 {
-    [RequireComponent(typeof(Collider))]
+    [RequireComponent(typeof(SphereCollider))]
     public class DamageableSensor : MonoBehaviour
     {
+        private new SphereCollider collider;//new Keyword because MonoBehaviour has a collider property
         private HashSet<IDamageable> damageables = new();
         public List<IDamageable> Damageables => damageables.ToList();
 
@@ -16,6 +17,12 @@ namespace RTS_LEARN.Units
         // public UnitDetectionEvent OnUnitExit;
         public event UnitDetectionEvent OnUnitEnter;
         public event UnitDetectionEvent OnUnitExit;
+
+
+        private void Awake()
+        {
+            collider = GetComponent<SphereCollider>();
+        }
 
 
         private void OnTriggerEnter(Collider collider)
@@ -35,6 +42,12 @@ namespace RTS_LEARN.Units
                 OnUnitExit?.Invoke(damageable);
             }
         }
+
+        public void SetupFrom(AttackConfigSO attackConfig)//invoke by AbstractUnit.cs Start()
+        {
+            collider.radius = attackConfig.AttackRange;
+        }
+
     }
 
 }

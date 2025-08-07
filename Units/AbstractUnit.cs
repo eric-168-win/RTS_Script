@@ -16,13 +16,18 @@ namespace RTS_LEARN.Units
         [SerializeField] private DamageableSensor DamageableSensor;
         private NavMeshAgent agent;
         protected BehaviorGraphAgent graphAgent;
-
+        protected UnitSO unitSO;
 
         void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
             graphAgent = GetComponent<BehaviorGraphAgent>();
             graphAgent.SetVariableValue("Command", UnitCommands.Stop);
+
+            unitSO = UnitSO as UnitSO;
+            //UnitSO from AbstractCommandable.cs
+            //cast UnitSO from AbstractUnitSO.cs to UnitSO.cs
+            graphAgent.SetVariableValue("AttackConfig", unitSO.AttackConfig);
         }
         protected override void Start()
         {
@@ -35,6 +40,7 @@ namespace RTS_LEARN.Units
             {
                 DamageableSensor.OnUnitEnter += HandleUnitEnterOrExit;
                 DamageableSensor.OnUnitExit += HandleUnitEnterOrExit;
+                DamageableSensor.SetupFrom(unitSO.AttackConfig);
             }
 
         }
