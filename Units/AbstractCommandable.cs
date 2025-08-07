@@ -8,16 +8,18 @@ using UnityEngine.Rendering.Universal;
 
 namespace RTS_LEARN.Units
 {
-    public abstract class AbstractCommandable : MonoBehaviour, ISelectable
+    public abstract class AbstractCommandable : MonoBehaviour, ISelectable, IDamageable
     {
         [field: SerializeField] public bool IsSelected { get; protected set; }
         [field: SerializeField] public int CurrentHealth { get; protected set; }
         [field: SerializeField] public int MaxHealth { get; protected set; }
+        public Transform Transform => transform;
         [field: SerializeField] public BaseCommand[] AvailableCommands { get; private set; }
         [SerializeField] protected DecalProjector decalProjector;
         private BaseCommand[] initialCommands;
 
         [field: SerializeField] public AbstractUnitSO UnitSO { get; private set; }
+
 
         public delegate void HealthUpdatedEvent(AbstractCommandable commandable, int lastHealth, int newHealth);
         public event HealthUpdatedEvent OnHealthUpdated;
@@ -74,5 +76,23 @@ namespace RTS_LEARN.Units
             CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
             OnHealthUpdated?.Invoke(this, lastHealth, CurrentHealth);
         }
+
+        public void TakeDamage(int damage)
+        {
+            int lastHealth = CurrentHealth;
+            CurrentHealth = Mathf.Clamp(CurrentHealth - damage, 0, CurrentHealth);
+
+            OnHealthUpdated?.Invoke(this, lastHealth, CurrentHealth);
+            if (CurrentHealth <= 0)
+            {
+                Die();
+            }
+        }
+
+        public void Die()
+        {
+            Destroy(gameObject);
+        }
+
     }
 }
