@@ -355,6 +355,7 @@ namespace RTS_LEARN.Player
                 Debug.Log($"Handling command: [{activeCommand.name}] for [{absCmdables[i].name}] at hit point: {hit.point}");
                 if (activeCommand.CanHandle(context))
                 {
+                    Debug.Log($"Command [{activeCommand.name}] can handle context for [{absCmdables[i].name}]");
                     activeCommand.Handle(context);
                     if (activeCommand.IsSingleUnitCommand)
                     {

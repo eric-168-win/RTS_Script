@@ -6,5 +6,7 @@ namespace RTS_LEARN.Utilities
     {
         public static int SPEED = Animator.StringToHash("Speed");
         public static int IS_GATHERING = Animator.StringToHash("IsGathering");
+
+        public static int ATTACK = Animator.StringToHash("Attack");
     }
 }

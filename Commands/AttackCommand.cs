@@ -8,6 +8,7 @@ namespace RTS_LEARN.Commands
     {
         public override bool CanHandle(CommandContext context)
         {
+            Debug.Log(context.Hit.collider.name + "" + (context.Commandable is IAttacker) + "" + (context.Hit.collider != null) + "" + context.Hit.collider.TryGetComponent(out IDamageable _));
             return context.Commandable is IAttacker
                 && context.Hit.collider != null
                 && context.Hit.collider.TryGetComponent(out IDamageable _);

@@ -83,8 +83,10 @@ namespace RTS_LEARN.Units
 
         public void Attack(IDamageable damageable)
         {
-            // set some graph variables here!
-            Debug.Log($"{name} should attack {damageable.Transform.name}");
+            Debug.Log($"Attacking {damageable.Transform.name}");
+            graphAgent.SetVariableValue("TargetGameObject", damageable.Transform.gameObject);
+            graphAgent.SetVariableValue("Command", UnitCommands.Attack);
+
         }
 
     }
