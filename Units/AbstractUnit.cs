@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
+using RTS_LEARN.Utilities;
 using Unity.Behavior;
 using UnityEngine;
 using UnityEngine.AI;
@@ -31,8 +33,8 @@ namespace RTS_LEARN.Units
 
             if (DamageableSensor != null)
             {
-                DamageableSensor.OnUnitEnter += HandleUnitEnter;
-                DamageableSensor.OnUnitExit += HandleUnitExit;
+                DamageableSensor.OnUnitEnter += HandleUnitEnterOrExit;
+                DamageableSensor.OnUnitExit += HandleUnitEnterOrExit;
             }
 
         }
@@ -58,15 +60,20 @@ namespace RTS_LEARN.Units
             Bus<UnitDeathEvent>.Raise(new UnitDeathEvent(this));
         }
 
-        private void HandleUnitEnter(IDamageable damageable)
+        private void HandleUnitEnterOrExit(IDamageable damageable)
         {
-            Debug.Log($"Detected unit enter! {DamageableSensor.Damageables.Count} nearby damageables!");
+            List<GameObject> nearbyEnemies = DamageableSensor.Damageables.ConvertAll(damageable => damageable.Transform.gameObject);
+            nearbyEnemies.Sort(new ClosestGameObjectComparer(transform.position));
+
+            graphAgent.SetVariableValue("NearbyEnemies", nearbyEnemies);
+
         }
 
-        private void HandleUnitExit(IDamageable damageable)
-        {
-            Debug.Log($"Detected unit exit! {DamageableSensor.Damageables.Count} nearby damageables!");
-        }
+        // private void HandleUnitExit(IDamageable damageable)
+        // {
+        //     graphAgent.SetVariableValue("NearbyEnemies",
+        //     DamageableSensor.Damageables.ConvertAll(damageable => damageable.Transform.gameObject));
+        // }
 
     }
 }

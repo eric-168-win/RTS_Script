@@ -12,8 +12,11 @@ namespace RTS_LEARN.Units
         public List<IDamageable> Damageables => damageables.ToList();
 
         public delegate void UnitDetectionEvent(IDamageable damageable);
-        public UnitDetectionEvent OnUnitEnter;
-        public UnitDetectionEvent OnUnitExit;
+        // public UnitDetectionEvent OnUnitEnter;
+        // public UnitDetectionEvent OnUnitExit;
+        public event UnitDetectionEvent OnUnitEnter;
+        public event UnitDetectionEvent OnUnitExit;
+
 
         private void OnTriggerEnter(Collider collider)
         {
