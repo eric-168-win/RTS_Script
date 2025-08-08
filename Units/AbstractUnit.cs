@@ -13,6 +13,7 @@ namespace RTS_LEARN.Units
     {
 
         public float AgentRadius => agent.radius; //meaning only Getter// expression bodied property
+        [field: SerializeField] public ParticleSystem AttackingParticleSystem { get; private set; }
         [SerializeField] private DamageableSensor DamageableSensor;
         private NavMeshAgent agent;
         protected BehaviorGraphAgent graphAgent;
