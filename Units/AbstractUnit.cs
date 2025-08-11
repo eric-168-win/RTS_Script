@@ -39,8 +39,8 @@ namespace RTS_LEARN.Units
 
             if (DamageableSensor != null)
             {
-                DamageableSensor.OnUnitEnter += HandleUnitEnterOrExit;
-                DamageableSensor.OnUnitExit += HandleUnitEnterOrExit;
+                DamageableSensor.OnUnitEnter += HandleUnitEnter;
+                DamageableSensor.OnUnitExit += HandleUnitExit;
                 DamageableSensor.SetupFrom(unitSO.AttackConfig);
             }
 
@@ -49,7 +49,7 @@ namespace RTS_LEARN.Units
         public void MoveTo(Vector3 position)
         {
             // agent.SetDestination(position);
-            SetCommandOverrides(null); // Clear commands
+            // SetCommandOverrides(null); // Clear commands
             graphAgent.SetVariableValue("TargetLocation", position);
             graphAgent.SetVariableValue("Command", UnitCommands.Move);//will abort current execution => place after TargetLocation
 
@@ -62,26 +62,6 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Command", UnitCommands.Stop);
         }
 
-        private void OnDestroy()
-        {
-            Bus<UnitDeathEvent>.Raise(new UnitDeathEvent(this));
-        }
-
-        private void HandleUnitEnterOrExit(IDamageable damageable)
-        {
-            List<GameObject> nearbyEnemies = DamageableSensor.Damageables.ConvertAll(damageable => damageable.Transform.gameObject);
-            nearbyEnemies.Sort(new ClosestGameObjectComparer(transform.position));
-
-            graphAgent.SetVariableValue("NearbyEnemies", nearbyEnemies);
-
-        }
-
-        // private void HandleUnitExit(IDamageable damageable)
-        // {
-        //     graphAgent.SetVariableValue("NearbyEnemies",
-        //     DamageableSensor.Damageables.ConvertAll(damageable => damageable.Transform.gameObject));
-        // }
-
         public void Attack(IDamageable damageable)
         {
             Debug.Log($"Attacking {damageable.Transform.name}");
@@ -90,5 +70,57 @@ namespace RTS_LEARN.Units
 
         }
 
+        public void Attack(Vector3 location)
+        {
+            graphAgent.SetVariableValue<GameObject>("TargetGameObject", null);
+            graphAgent.SetVariableValue("TargetLocation", location);
+            graphAgent.SetVariableValue("Command", UnitCommands.Attack);
+        }
+
+
+        private void HandleUnitEnter(IDamageable damageable)
+        {
+            List<GameObject> nearbyEnemies = SetNearbyEnemiesOnBlackboard();
+
+            if (graphAgent.GetVariable("TargetGameObject", out BlackboardVariable<GameObject> targetVariable)
+                && targetVariable.Value == null && nearbyEnemies.Count > 0)
+            {
+                graphAgent.SetVariableValue("TargetGameObject", nearbyEnemies[0]);
+            }
+        }
+
+        private void HandleUnitExit(IDamageable damageable)
+        {
+            List<GameObject> nearbyEnemies = SetNearbyEnemiesOnBlackboard();
+
+            if (!graphAgent.GetVariable("TargetGameObject", out BlackboardVariable<GameObject> targetVariable)
+                || damageable.Transform.gameObject != targetVariable.Value) return;
+
+            if (nearbyEnemies.Count > 0)
+            {
+                graphAgent.SetVariableValue("TargetGameObject", nearbyEnemies[0]);
+            }
+            else
+            {
+                graphAgent.SetVariableValue<GameObject>("TargetGameObject", null);
+                graphAgent.SetVariableValue("TargetLocation", damageable.Transform.position);
+            }
+        }
+
+        private List<GameObject> SetNearbyEnemiesOnBlackboard()
+        {
+            List<GameObject> nearbyEnemies = DamageableSensor.Damageables
+                            .ConvertAll(damageable => damageable.Transform.gameObject);
+            nearbyEnemies.Sort(new ClosestGameObjectComparer(transform.position));
+
+            graphAgent.SetVariableValue("NearbyEnemies", nearbyEnemies);
+
+            return nearbyEnemies;
+        }
+
+        private void OnDestroy()
+        {
+            Bus<UnitDeathEvent>.Raise(new UnitDeathEvent(this));
+        }
     }
 }

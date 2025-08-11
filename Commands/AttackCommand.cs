@@ -8,16 +8,23 @@ namespace RTS_LEARN.Commands
     {
         public override bool CanHandle(CommandContext context)
         {
-            Debug.Log(context.Hit.collider.name + "" + (context.Commandable is IAttacker) + "" + (context.Hit.collider != null) + "" + context.Hit.collider.TryGetComponent(out IDamageable _));
-            return context.Commandable is IAttacker
-                && context.Hit.collider != null
-                && context.Hit.collider.TryGetComponent(out IDamageable _);
+
+            return context.Commandable is IAttacker && context.Hit.collider != null;
+            // && context.Hit.collider.TryGetComponent(out IDamageable _);
         }
 
         public override void Handle(CommandContext context)
         {
             IAttacker attacker = context.Commandable as IAttacker;
-            attacker.Attack(context.Hit.collider.GetComponent<IDamageable>());
+            if (context.Hit.collider.TryGetComponent(out IDamageable damageable))
+            {
+                attacker.Attack(damageable);
+            }
+            else
+            {
+                attacker.Attack(context.Hit.point);
+            }
+
         }
 
         public override bool IsLocked(CommandContext context) => false;

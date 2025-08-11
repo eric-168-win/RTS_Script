@@ -6,6 +6,7 @@ using Unity.Properties;
 using UnityEngine.AI;
 using RTS_LEARN.Utilities;
 using RTS_LEARN.Units;
+using System.Collections.Generic;
 
 namespace RTS_LEARN.Behavior
 {
@@ -17,6 +18,7 @@ namespace RTS_LEARN.Behavior
         [SerializeReference] public BlackboardVariable<GameObject> Self;
         [SerializeReference] public BlackboardVariable<GameObject> Target;
         [SerializeReference] public BlackboardVariable<AttackConfigSO> AttackConfig;
+        [SerializeReference] public BlackboardVariable<List<GameObject>> NearbyEnemies;
 
         private AbstractUnit unit;
         private NavMeshAgent navMeshAgent;
@@ -40,6 +42,20 @@ namespace RTS_LEARN.Behavior
             targetTransform = Target.Value.transform;
             targetDamageable = Target.Value.GetComponent<IDamageable>();
 
+            if (!NearbyEnemies.Value.Contains(Target.Value))
+            {
+                navMeshAgent.SetDestination(targetTransform.position);
+                navMeshAgent.isStopped = false;
+                if (animator != null)
+                {
+                    animator.SetBool(AnimationConstants.ATTACK, false);
+                }
+            }
+            else
+            {
+                navMeshAgent.isStopped = true;
+            }
+
             return Status.Running;
         }
 
@@ -52,18 +68,8 @@ namespace RTS_LEARN.Behavior
                 animator.SetFloat(AnimationConstants.SPEED, navMeshAgent.velocity.magnitude);
             }
 
-
-            if (Vector3.Distance(targetTransform.position, selfTransform.position) >= AttackConfig.Value.AttackRange)
+            if (!NearbyEnemies.Value.Contains(Target.Value))
             {
-                navMeshAgent.SetDestination(targetTransform.position);
-                navMeshAgent.isStopped = false;
-
-                if (animator != null)
-                {
-                    animator.SetBool(AnimationConstants.ATTACK, false);
-                }
-
-
                 return Status.Running;
             }
 
@@ -74,9 +80,9 @@ namespace RTS_LEARN.Behavior
             // not use because We only want the Y-axis to move
 
             Quaternion lookRotation = Quaternion.LookRotation(
-             (targetTransform.position - selfTransform.position).normalized,
-             Vector3.up
-         );
+                    (targetTransform.position - selfTransform.position).normalized,
+                    Vector3.up
+            );
             selfTransform.rotation = Quaternion.Euler(
                 selfTransform.rotation.eulerAngles.x,
                 lookRotation.eulerAngles.y,
@@ -88,7 +94,6 @@ namespace RTS_LEARN.Behavior
                 animator.SetBool(AnimationConstants.ATTACK, true);
             }
 
-
             if (Time.time >= lastAttackTime + AttackConfig.Value.AttackDelay)
             {
                 lastAttackTime = Time.time;
@@ -96,7 +101,6 @@ namespace RTS_LEARN.Behavior
                 {
                     unit.AttackingParticleSystem.Play();
                 }
-
                 targetDamageable.TakeDamage(AttackConfig.Value.Damage);
             }
 
@@ -109,12 +113,16 @@ namespace RTS_LEARN.Behavior
             {
                 animator.SetBool(AnimationConstants.ATTACK, false);
             }
+            if (navMeshAgent != null)
+            {
+                navMeshAgent.isStopped = false;
+            }
         }
 
         private bool HasValidInputs() => Self.Value != null && Self.Value.TryGetComponent(out NavMeshAgent _)
             && Self.Value.TryGetComponent(out AbstractUnit _)
             && Target.Value != null && Target.Value.TryGetComponent(out IDamageable _)
-            && AttackConfig.Value != null;
+            && AttackConfig.Value != null && NearbyEnemies != null;
     }
 
 }
