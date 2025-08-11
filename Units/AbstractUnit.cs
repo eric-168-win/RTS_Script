@@ -19,7 +19,7 @@ namespace RTS_LEARN.Units
         protected BehaviorGraphAgent graphAgent;
         protected UnitSO unitSO;
 
-        void Awake()
+        protected virtual void Awake()
         {
             agent = GetComponent<NavMeshAgent>();
             graphAgent = GetComponent<BehaviorGraphAgent>();
@@ -118,7 +118,7 @@ namespace RTS_LEARN.Units
             return nearbyEnemies;
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             Bus<UnitDeathEvent>.Raise(new UnitDeathEvent(this));
         }
