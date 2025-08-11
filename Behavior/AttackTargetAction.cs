@@ -70,6 +70,7 @@ namespace RTS_LEARN.Behavior
 
             if (!NearbyEnemies.Value.Contains(Target.Value))
             {
+                //Vector3.Distance(targetTransform.position, selfTransform.position) >= AttackConfig.Value.AttackRange
                 return Status.Running;
             }
 
