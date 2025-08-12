@@ -27,7 +27,7 @@ namespace RTS_LEARN.Behavior
 
         private IDamageable targetDamageable;
         private Transform targetTransform;
-
+        private Collider[] enemyColliders;
         private float lastAttackTime;
 
         protected override Status OnStart()
@@ -41,6 +41,11 @@ namespace RTS_LEARN.Behavior
 
             targetTransform = Target.Value.transform;
             targetDamageable = Target.Value.GetComponent<IDamageable>();
+
+            if (AttackConfig.Value.IsAreaOfEffect)
+            {
+                enemyColliders = new Collider[AttackConfig.Value.MaxEnemiesHitPerAttack];
+            }
 
             if (!NearbyEnemies.Value.Contains(Target.Value))
             {
@@ -62,12 +67,11 @@ namespace RTS_LEARN.Behavior
         protected override Status OnUpdate()
         {
             if (Target.Value == null || targetDamageable.CurrentHealth == 0) return Status.Success;
-
+            
             if (animator != null)
             {
                 animator.SetFloat(AnimationConstants.SPEED, navMeshAgent.velocity.magnitude);
             }
-
             if (!NearbyEnemies.Value.Contains(Target.Value))
             {
                 //Vector3.Distance(targetTransform.position, selfTransform.position) >= AttackConfig.Value.AttackRange
@@ -76,10 +80,25 @@ namespace RTS_LEARN.Behavior
 
             navMeshAgent.isStopped = true;
 
+            LookAtTarget();
+
+            if (animator != null)
+            {
+                animator.SetBool(AnimationConstants.ATTACK, true);
+            }
+            if (Time.time >= lastAttackTime + AttackConfig.Value.AttackDelay)
+            {
+                ApplyDamage();
+            }
+
+            return Status.Running;
+        }
+
+        private void LookAtTarget()
+        {
             // selfTransform.LookAt(targetTransform); 
             // //may break the 3D model if there are height elevation differences
             // not use because We only want the Y-axis to move
-
             Quaternion lookRotation = Quaternion.LookRotation(
                     (targetTransform.position - selfTransform.position).normalized,
                     Vector3.up
@@ -89,28 +108,42 @@ namespace RTS_LEARN.Behavior
                 lookRotation.eulerAngles.y,
                 selfTransform.rotation.eulerAngles.z
             );
+        }
 
-            if (animator != null)
+        private void ApplyDamage()
+        {
+            lastAttackTime = Time.time;
+            if (unit.AttackingParticleSystem != null)
             {
-                animator.SetBool(AnimationConstants.ATTACK, true);
+                unit.AttackingParticleSystem.Play();
             }
+            // projectile attacks are handled by the specific subclass of AbstractUnit that shoot projectiles
+            if (AttackConfig.Value.HasProjectileAttacks) return;
 
-            if (Time.time >= lastAttackTime + AttackConfig.Value.AttackDelay)
+            targetDamageable.TakeDamage(AttackConfig.Value.Damage);
+
+            if (!AttackConfig.Value.IsAreaOfEffect) return;
+
+            int hits = Physics.OverlapSphereNonAlloc(
+                targetTransform.position,
+                AttackConfig.Value.AreaOfEffectRadius,
+                enemyColliders,
+                AttackConfig.Value.DamageableLayers
+            );
+
+            for (int i = 0; i < hits; i++)
             {
-                lastAttackTime = Time.time;
-                if (unit.AttackingParticleSystem != null)
+                if (enemyColliders[i].TryGetComponent(out IDamageable nearbyDamageable)
+                    && targetDamageable != nearbyDamageable)
                 {
-                    unit.AttackingParticleSystem.Play();
+                    nearbyDamageable.TakeDamage(
+                        AttackConfig.Value.CalculateAreaOfEffectDamage(
+                            targetTransform.position,
+                            nearbyDamageable.Transform.position
+                        )
+                    );
                 }
-                if (!AttackConfig.Value.HasProjectileAttacks)
-                {
-                    targetDamageable.TakeDamage(AttackConfig.Value.Damage);
-                    // projectile attacks are handled by the specific subclass of AbstractUnit that shoot projectiles
-                }
-
             }
-
-            return Status.Running;
         }
 
         protected override void OnEnd()

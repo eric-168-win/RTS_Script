@@ -11,6 +11,7 @@ namespace RTS_LEARN.Units
 
         private Transform grenadeParent;
         private Vector3 defaultGrenadePosition;
+        private Collider[] enemyColliders;
 
         protected override void Awake()
         {
@@ -25,6 +26,13 @@ namespace RTS_LEARN.Units
             defaultGrenadePosition = grenade.transform.localPosition;
             grenadeParent = grenade.transform.parent;
         }
+
+        protected override void Start()
+        {
+            base.Start();
+            enemyColliders = new Collider[unitSO.AttackConfig.MaxEnemiesHitPerAttack];
+        }
+
 
         // Animation Event (0 references)
         public void OnThrowGrenade()
@@ -44,7 +52,6 @@ namespace RTS_LEARN.Units
             {
                 endPosition = targetLocationVariable;
             }
-
             StartCoroutine(AnimateGrenadeMovement(startPosition, endPosition, damageable));
         }
 
@@ -58,21 +65,47 @@ namespace RTS_LEARN.Units
                 time += Time.deltaTime * speed;
                 yield return null;
             }
-            damageable?.TakeDamage(unitSO.AttackConfig.Damage);
-
             explosionParticles.transform.SetParent(null);
             explosionParticles.transform.position = endPosition;
             explosionParticles.Play();
 
             grenade.transform.SetParent(grenadeParent);
             grenade.transform.localPosition = defaultGrenadePosition;
+
+            ApplyDamage(endPosition, damageable);
+        }
+
+        private void ApplyDamage(Vector3 endPosition, IDamageable damageable)
+        {
+            damageable?.TakeDamage(unitSO.AttackConfig.Damage);//done Here
+
+            if (unitSO.AttackConfig.IsAreaOfEffect)
+            {
+                int hits = Physics.OverlapSphereNonAlloc(
+                    endPosition,
+                    unitSO.AttackConfig.AreaOfEffectRadius,
+                    enemyColliders,
+                    unitSO.AttackConfig.DamageableLayers
+                );
+
+                for (int i = 0; i < hits; i++)
+                {
+                    if (enemyColliders[i].TryGetComponent(out IDamageable nearbyDamageable)
+                        && damageable != nearbyDamageable)//except done Here, avoid repeat
+                    {
+                        nearbyDamageable.TakeDamage(
+                            unitSO.AttackConfig.CalculateAreaOfEffectDamage(endPosition, nearbyDamageable.Transform.position)
+                        );
+                    }
+                }
+            }
         }
 
         protected override void OnDestroy()
         {
-            base.OnDestroy();
-            Destroy(grenade);
             Destroy(explosionParticles.gameObject);
+            Destroy(grenade);
+            base.OnDestroy();
         }
     }
 
