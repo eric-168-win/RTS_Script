@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace GameDevTV.RTS.Units
+namespace RTS_LEARN.Units
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]
