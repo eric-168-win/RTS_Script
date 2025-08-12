@@ -20,6 +20,7 @@ namespace RTS_LEARN.Behavior
 
         protected override Status OnStart()
         {
+            Debug.Log("aaa");
             if (!Agent.Value.TryGetComponent(out agent))
             {
                 return Status.Failure;
@@ -30,6 +31,7 @@ namespace RTS_LEARN.Behavior
             {
                 return Status.Success;
             }
+            Debug.Log("bbb");
 
             agent.SetDestination(TargetLocation.Value);
 
@@ -43,6 +45,7 @@ namespace RTS_LEARN.Behavior
                 animator.SetFloat(AnimationConstants.SPEED, agent.velocity.magnitude);
                 // Animator.StringToHash("Speed") //Faster than "Speed"
             }
+            Debug.Log("ccc");
 
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             //OnUpdate is not deplayed a frame anymore => Add !agent.pathPending &&
@@ -50,6 +53,8 @@ namespace RTS_LEARN.Behavior
                 return Status.Success;
 
             }
+            Debug.Log("ddd");
+
             return Status.Running;
         }
 

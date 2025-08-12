@@ -77,7 +77,7 @@ namespace RTS_LEARN.Player
             Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
             Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
             Bus<CommandSelectedEvent>.OnEvent += HandleCommandSelected;
-     
+
         }
 
         private void HandleUnitDeath(UnitDeathEvent evt)
@@ -275,7 +275,6 @@ namespace RTS_LEARN.Player
             return allAvailableCommands;
         }
 
-
         private void HandleRightClick()
         {
             if (selectedUnits.Count == 0) { return; }
@@ -379,6 +378,31 @@ namespace RTS_LEARN.Player
 
             cameraTarget.linearVelocity = new Vector3(moveAmount.x, 0, moveAmount.y);
         }
+
+        // private void HandleZooming()
+        // {
+        //     float scrollInput = Input.GetAxis("Mouse ScrollWheel");
+
+        //     // if (scrollInput != 0f && mainCamera != null)
+        //     // {
+        //     //     if (mainCamera.orthographic)
+        //     //     {
+        //     //         // Handle orthographic camera zoom
+        //     //         float newSize = mainCamera.orthographicSize - scrollInput * zoomSpeed;
+        //     //         mainCamera.orthographicSize = Mathf.Clamp(newSize, minOrthoSize, maxOrthoSize);
+        //     //     }
+        //     //     else
+        //     //     {
+        //     //         // Handle perspective camera zoom
+        //     //         float newFOV = mainCamera.fieldOfView - scrollInput * zoomSpeed;
+        //     //         mainCamera.fieldOfView = Mathf.Clamp(newFOV, minFOV, maxFOV);
+        //     //     }
+        //     // }
+
+        //     if (scrollInput != 0f) {
+        //         cameraTarget.linearVelocity = new Vector3(0, 1, 0);
+        //     }
+        // }
 
         private Vector2 GetMouseMovement()
         {

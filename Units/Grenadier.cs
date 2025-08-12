@@ -103,7 +103,10 @@ namespace RTS_LEARN.Units
 
         protected override void OnDestroy()
         {
-            Destroy(explosionParticles.gameObject);
+            if (explosionParticles.gameObject != null)
+            {
+                Destroy(explosionParticles.gameObject);
+            }
             Destroy(grenade);
             base.OnDestroy();
         }
