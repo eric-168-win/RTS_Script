@@ -11,7 +11,8 @@ namespace RTS_LEARN.Units
         Gather,
         ReturnSupplies,
         BuildBuilding,
-        Attack
+        Attack,
+        LoadUnits
 
     }
 }
