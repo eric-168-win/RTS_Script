@@ -10,12 +10,11 @@ using UnityEngine;
 
 namespace RTS_LEARN.Units
 {
-    public class Worker : AbstractUnit, IBuildingBuilder
+    public class Worker : AbstractUnit, IBuildingBuilder, ITransportable
     {
         public bool IsBuilding =>
             graphAgent.GetVariable("Command", out BlackboardVariable<UnitCommands> command)
             && command.Value == UnitCommands.BuildBuilding;
-        [SerializeField] private BaseCommand CancelBuildingCommand;
         public bool HasSupplies
         {
             get
@@ -28,6 +27,8 @@ namespace RTS_LEARN.Units
                 return false;
             }
         }
+        public int TransportCapacityUsage => unitSO.TransportConfig.GetTransportCapacityUsage();
+        [SerializeField] private BaseCommand CancelBuildingCommand;
 
         protected override void Start()
         {
@@ -73,6 +74,10 @@ namespace RTS_LEARN.Units
             Bus<SupplyEvent>.Raise(new SupplyEvent(amount, supply));
         }
 
+        public void LoadInto(ITransporter transporter)
+        {
+            throw new NotImplementedException();
+        }
 
         public void Gather(GatherableSupply supply)
         {
@@ -113,8 +118,6 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
 
         }
-
-
 
         public void ReturnSupplies(GameObject commandPost)
         {
@@ -157,6 +160,5 @@ namespace RTS_LEARN.Units
 
             Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this));
         }
-
     }
 }

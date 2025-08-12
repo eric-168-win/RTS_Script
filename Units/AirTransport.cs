@@ -1,11 +1,16 @@
+using System;
+using System.Collections.Generic;
 using RTS_LEARN.Behavior;
 using Unity.Behavior;
 using UnityEngine;
 
 namespace RTS_LEARN.Units
 {
-    public class AirTransport : AbstractUnit
+    public class AirTransport : AbstractUnit, ITransporter
     {
+        public int Capacity => unitSO.TransportConfig.Capacity;
+        [field: SerializeField] public int UsedCapacity { get; private set; }
+
         protected override void Start()
         {
             base.Start();
@@ -16,11 +21,41 @@ namespace RTS_LEARN.Units
             }
         }
 
-        private void HandleLoadUnit(GameObject self, GameObject targetGameObject)
+        public List<ITransportable> GetLoadedUnits()
         {
-            Debug.Log($"Load unit {targetGameObject.name}");
+            throw new NotImplementedException();
         }
 
+        public void Load(ITransportable unit)
+        {
+            if (UsedCapacity + unit.TransportCapacityUsage > Capacity) return;
+
+            graphAgent.SetVariableValue("TargetGameObject", unit.Transform.gameObject);
+            graphAgent.SetVariableValue("Command", UnitCommands.LoadUnits);
+        }
+
+        public void Load(ITransportable[] units)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Unload(ITransportable unit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UnloadAll()
+        {
+            throw new NotImplementedException();
+        }
+        private void HandleLoadUnit(GameObject self, GameObject targetGameObject)
+        {
+            targetGameObject.SetActive(false);
+            targetGameObject.transform.SetParent(self.transform);
+            ITransportable transportable = targetGameObject.GetComponent<ITransportable>();
+            UsedCapacity += transportable.TransportCapacityUsage;
+
+        }
     }
 
 }

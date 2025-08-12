@@ -1,8 +1,13 @@
 namespace RTS_LEARN.Units
 {
-    public class BaseMilitaryUnit : AbstractUnit
+    public class BaseMilitaryUnit : AbstractUnit, ITransportable
     {
-        // Base class for military units, can be extended with specific military unit functionality
-        // This class can include
+        public int TransportCapacityUsage => unitSO.TransportConfig.GetTransportCapacityUsage();
+
+        public void LoadInto(ITransporter transporter)
+        {
+            throw new System.NotImplementedException();
+        }
+
     }
 }
