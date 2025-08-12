@@ -22,6 +22,13 @@ namespace RTS_LEARN.Commands
             // IMoveable moveable = (IMoveable)context.Commandable;
             AbstractUnit unit = (AbstractUnit)context.Commandable;
 
+            //follow the target while the target is moving
+            if (context.Hit.collider != null && context.Hit.collider.TryGetComponent(out AbstractCommandable commandable))
+            {
+                unit.MoveTo(commandable.transform);
+                return;
+            }
+
             if (context.UnitIndex == 0)
             {
                 unitsOnLayer = 0;

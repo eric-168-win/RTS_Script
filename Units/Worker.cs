@@ -76,7 +76,8 @@ namespace RTS_LEARN.Units
 
         public void LoadInto(ITransporter transporter)
         {
-            throw new NotImplementedException();
+            MoveTo(transporter.Transform);
+            transporter.Load(this);
         }
 
         public void Gather(GatherableSupply supply)

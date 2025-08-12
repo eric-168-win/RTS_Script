@@ -51,8 +51,15 @@ namespace RTS_LEARN.Units
             // agent.SetDestination(position);
             // SetCommandOverrides(null); // Clear commands
             graphAgent.SetVariableValue("TargetLocation", position);
+            graphAgent.SetVariableValue<GameObject>("TargetGameObject", null);
             graphAgent.SetVariableValue("Command", UnitCommands.Move);//will abort current execution => place after TargetLocation
 
+        }
+
+        public void MoveTo(Transform transform)
+        {
+            graphAgent.SetVariableValue("TargetGameObject", transform.gameObject);
+            graphAgent.SetVariableValue("Command", UnitCommands.Move);
         }
 
         public void Stop()

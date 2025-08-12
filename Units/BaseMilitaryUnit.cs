@@ -6,8 +6,8 @@ namespace RTS_LEARN.Units
 
         public void LoadInto(ITransporter transporter)
         {
-            throw new System.NotImplementedException();
+            MoveTo(transporter.Transform);
+            transporter.Load(this);
         }
-
     }
 }
