@@ -70,7 +70,7 @@ namespace RTS_LEARN.Units
             if (UsedCapacity >= Capacity)
             {
                 graphAgent.SetVariableValue("Command", UnitCommands.Stop);
-                graphAgent.SetVariableValue("LoadUnitTargets", new List<GameObject>(unitSO.TransportConfig.Capacity));
+                graphAgent.SetVariableValue("LoadUnitTargets", new List<GameObject>(unitSO.TransportConfig.Capacity));//empty and reset
             }
 
         }

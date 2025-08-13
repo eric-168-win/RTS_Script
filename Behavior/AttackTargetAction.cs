@@ -67,7 +67,7 @@ namespace RTS_LEARN.Behavior
         protected override Status OnUpdate()
         {
             if (Target.Value == null || targetDamageable.CurrentHealth == 0) return Status.Success;
-            
+
             if (animator != null)
             {
                 animator.SetFloat(AnimationConstants.SPEED, navMeshAgent.velocity.magnitude);

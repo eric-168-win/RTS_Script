@@ -8,7 +8,6 @@ namespace RTS_LEARN.Commands
     {
         public override bool CanHandle(CommandContext context)
         {
-
             return context.Commandable is IAttacker && context.Hit.collider != null;
             // && context.Hit.collider.TryGetComponent(out IDamageable _);
         }
@@ -24,7 +23,6 @@ namespace RTS_LEARN.Commands
             {
                 attacker.Attack(context.Hit.point);
             }
-
         }
 
         public override bool IsLocked(CommandContext context) => false;
