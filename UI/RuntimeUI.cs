@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
+using RTS_LEARN.Events;
 using RTS_LEARN.UI.Containers;
 using RTS_LEARN.Units;
 using Unity.VisualScripting;
@@ -25,6 +26,9 @@ namespace RTS_LEARN.UI
             Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
             Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
             Bus<SupplyEvent>.OnEvent += HandleSupplyChange;
+            Bus<UnitLoadEvent>.OnEvent += HandleLoadUnit;
+            Bus<UnitUnloadEvent>.OnEvent += HandleUnloadUnit;
+
         }
 
         void Start()
@@ -42,8 +46,30 @@ namespace RTS_LEARN.UI
             Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
             Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
             Bus<SupplyEvent>.OnEvent -= HandleSupplyChange;
-
+            Bus<UnitLoadEvent>.OnEvent -= HandleLoadUnit;
+            Bus<UnitUnloadEvent>.OnEvent -= HandleUnloadUnit;
         }
+
+        private void HandleLoadUnit(UnitLoadEvent evt)
+        {
+            if (selectedUnits.Count == 1 && selectedUnits.First() is ITransporter)
+            {
+                RefreshUI();
+            }
+            else if (evt.Unit is AbstractCommandable commandable && selectedUnits.Contains(commandable))
+            {
+                commandable.Deselect(); // RefreshUI will be called because of the UnitDeselectedEvent raised from this.
+            }
+        }
+
+        private void HandleUnloadUnit(UnitUnloadEvent evt)
+        {
+            if (selectedUnits.Count == 1 && selectedUnits.First() is ITransporter)
+            {
+                RefreshUI();
+            }
+        }
+
 
         private void HandleSupplyChange(SupplyEvent evt)
         {
