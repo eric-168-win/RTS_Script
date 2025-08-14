@@ -16,6 +16,7 @@ namespace RTS_LEARN.UI
         [SerializeField] private BuildingSelectedUI buildingSelectedUI;
         [SerializeField] private UnitIconUI unitIconUI;
         [SerializeField] private SingleUnitSelectedUI singleUnitSelectedUI;
+        [SerializeField] private UnitTransportUI unitTransportUI;
         HashSet<AbstractCommandable> selectedUnits = new(12);
 
         void Awake()
@@ -32,6 +33,7 @@ namespace RTS_LEARN.UI
             unitIconUI.Disable();
             singleUnitSelectedUI.Disable();
             buildingSelectedUI.Disable();
+            unitTransportUI.Disable();
         }
 
         void OnDestroy()
@@ -80,38 +82,56 @@ namespace RTS_LEARN.UI
 
                 if (selectedUnits.Count == 1)
                 {
-                    AbstractCommandable commandable = selectedUnits.First();
-                    unitIconUI.EnableFor(commandable);
-
-                    singleUnitSelectedUI.EnableFor(commandable);
-
-                    if (commandable is BaseBuilding building)
-                    {
-                        singleUnitSelectedUI.Disable();
-                        buildingSelectedUI.EnableFor(building);
-                    }
-                    else
-                    {
-                        singleUnitSelectedUI.EnableFor(commandable);
-                        buildingSelectedUI.Disable();
-                    }
+                    ResolveSingleUnitSelectedUI();
                 }
                 else
                 {
                     unitIconUI.Disable();
                     singleUnitSelectedUI.Disable();
                     buildingSelectedUI.Disable();
+                    unitTransportUI.Disable();
                 }
             }
             else
             {
-                commandsUI.Disable();
-                buildingSelectedUI.Disable();
-                unitIconUI.Disable();
-                singleUnitSelectedUI.Disable();
+                DisableAllContainers();
             }
         }
 
+        private void DisableAllContainers()
+        {
+            commandsUI.Disable();
+            buildingSelectedUI.Disable();
+            unitIconUI.Disable();
+            singleUnitSelectedUI.Disable();
+            unitTransportUI.Disable();
+        }
+
+        private void ResolveSingleUnitSelectedUI()
+        {
+            AbstractCommandable commandable = selectedUnits.First();
+            unitIconUI.EnableFor(commandable);
+
+            if (commandable is BaseBuilding building)
+            {
+                singleUnitSelectedUI.Disable();
+                unitTransportUI.Disable();
+                buildingSelectedUI.EnableFor(building);
+            }
+            else if (commandable is ITransporter transporter && transporter.UsedCapacity > 0)
+            {
+                unitTransportUI.EnableFor(transporter);
+                buildingSelectedUI.Disable();
+                singleUnitSelectedUI.Disable();
+            }
+            else
+            {
+                buildingSelectedUI.Disable();
+                unitTransportUI.Disable();
+                singleUnitSelectedUI.EnableFor(commandable);
+            }
+        }
 
     }
 }
+

@@ -8,8 +8,10 @@ namespace RTS_LEARN.Units
         public Transform Transform { get; }
         public int TransportCapacityUsage { get; }
         public NavMeshAgent Agent { get; }
-        
+
         public void LoadInto(ITransporter transporter);
+
+        public Sprite Icon { get; }
     }
 
 }
