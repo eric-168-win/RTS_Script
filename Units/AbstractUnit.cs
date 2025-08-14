@@ -12,16 +12,16 @@ namespace RTS_LEARN.Units
     public abstract class AbstractUnit : AbstractCommandable, IMoveable, IAttacker
     {
 
-        public float AgentRadius => agent.radius; //meaning only Getter// expression bodied property
+        public float AgentRadius => Agent.radius; //meaning only Getter// expression bodied property
         [field: SerializeField] public ParticleSystem AttackingParticleSystem { get; private set; }
         [SerializeField] private DamageableSensor DamageableSensor;
-        private NavMeshAgent agent;
+        public NavMeshAgent  Agent { get; private set; }
         protected BehaviorGraphAgent graphAgent;
         protected UnitSO unitSO;
 
         protected virtual void Awake()
         {
-            agent = GetComponent<NavMeshAgent>();
+            Agent = GetComponent<NavMeshAgent>();
             graphAgent = GetComponent<BehaviorGraphAgent>();
             graphAgent.SetVariableValue("Command", UnitCommands.Stop);
 

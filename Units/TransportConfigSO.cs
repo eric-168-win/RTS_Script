@@ -7,7 +7,7 @@ namespace RTS_LEARN.Units
     {
         [field: SerializeField] public int Capacity { get; private set; }
         [field: SerializeField] public TransportSize Size { get; private set; }
-
+        [field: SerializeField] public LayerMask SafeDropLayers { get; private set; }
         public int GetTransportCapacityUsage() => Size switch
         {
             TransportSize.Small => 1,
