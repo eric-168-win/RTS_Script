@@ -106,6 +106,7 @@ namespace RTS_LEARN.Units
         {
             Awake();
             unitBuildingThis = buildingBuilder;
+            Owner = unitBuildingThis.Owner;
             MainRenderer.material = BuildingSO.PlacementMaterial;
             Debug.Log("On The Ground ::: " + BuildingSO.PlacementMaterial.name);
 
@@ -155,7 +156,11 @@ namespace RTS_LEARN.Units
 
                 yield return new WaitForSeconds(BuildingUnit.BuildTime);
 
-                Instantiate(BuildingUnit.Prefab, transform.position, Quaternion.identity);
+                GameObject instance = Instantiate(BuildingUnit.Prefab, transform.position, Quaternion.identity);
+                if (instance.TryGetComponent(out AbstractCommandable commandable))
+                {
+                    commandable.Owner = Owner;
+                }
                 buildingQueue.RemoveAt(0);
             }
             OnQueueUpdated?.Invoke(buildingQueue.ToArray());

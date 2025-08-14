@@ -13,6 +13,7 @@ namespace RTS_LEARN.Units
         [field: SerializeField] public bool IsSelected { get; protected set; }
         [field: SerializeField] public int CurrentHealth { get; protected set; }
         [field: SerializeField] public int MaxHealth { get; protected set; }
+        [field: SerializeField] public Owner Owner { get; set; }
         public Transform Transform => transform;
         [field: SerializeField] public BaseCommand[] AvailableCommands { get; private set; }
         [SerializeField] protected DecalProjector decalProjector;
