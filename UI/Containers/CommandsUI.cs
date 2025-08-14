@@ -39,24 +39,24 @@ namespace RTS_LEARN.UI.Containers
 
         private void RefreshButtons(HashSet<AbstractCommandable> selectedUnits)
         {
-            HashSet<BaseCommand> availableCommands = new(9);
+            IEnumerable<BaseCommand> availableCommands = selectedUnits.ElementAt(0).AvailableCommands;//[0] doesn't matter
 
-            foreach (AbstractCommandable commandable in selectedUnits)
+            for (int i = 1; i < selectedUnits.Count; i++)
             {
+                AbstractCommandable commandable = selectedUnits.ElementAt(i);
                 if (commandable.AvailableCommands != null)
                 {
-                    availableCommands.AddRange(commandable.AvailableCommands);
+                    availableCommands = availableCommands.Intersect(commandable.AvailableCommands);
                 }
-
             }
 
             for (int i = 0; i < actionButtons.Length; i++)
             {
                 BaseCommand actionForSlot = availableCommands.Where(action => action.Slot == i).FirstOrDefault();
+
                 if (actionForSlot != null)
                 {
-                    actionButtons[i].EnableFor(actionForSlot, HandleClick(actionForSlot));
-                    // Debug.Log($"Enabling button for action: {actionForSlot.name} in slot {i}");
+                    actionButtons[i].EnableFor(actionForSlot, selectedUnits, HandleClick(actionForSlot));
                 }
                 else
                 {

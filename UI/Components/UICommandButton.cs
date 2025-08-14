@@ -1,4 +1,6 @@
 
+using System.Collections.Generic;
+using System.Linq;
 using RTS_LEARN.Commands;
 using RTS_LEARN.Units;
 using UnityEngine;
@@ -9,7 +11,7 @@ using UnityEngine.UI;
 namespace RTS_LEARN.UI.Components
 {
     [RequireComponent(typeof(Button))]//force to add If not present
-    public class UICommandButton : MonoBehaviour, IUIElement<BaseCommand, UnityAction>, IPointerEnterHandler, IPointerExitHandler
+    public class UICommandButton : MonoBehaviour, IUIElement<BaseCommand, IEnumerable<AbstractCommandable>, UnityAction>, IPointerEnterHandler, IPointerExitHandler
     {
         public UnityAction OnPointerEnter { get; set; }
         public UnityAction OnPointerExit { get; set; }
@@ -28,20 +30,6 @@ namespace RTS_LEARN.UI.Components
             button = GetComponent<Button>();
             rectTransform = GetComponent<RectTransform>();
             Disable();
-        }
-
-        public void EnableFor(BaseCommand command, UnityAction onClick)
-        {
-            button.onClick.RemoveAllListeners();
-            SetIcon(command.Icon);
-            button.interactable = !command.IsLocked(new CommandContext());
-            button.onClick.AddListener(onClick);
-            isActive = true;
-
-            if (tooltip != null)
-            {
-                tooltip.SetText(GetTooltipText(command));
-            }
         }
 
         public void Disable()
@@ -128,5 +116,19 @@ namespace RTS_LEARN.UI.Components
             return tooltipText;
         }
 
+        public void EnableFor(BaseCommand command, IEnumerable<AbstractCommandable> selectedUnits, UnityAction onClick)
+        {
+            button.onClick.RemoveAllListeners();
+            SetIcon(command.Icon);
+            button.interactable = selectedUnits.Any((unit) => !command.IsLocked(new CommandContext(unit, new RaycastHit())));
+            button.onClick.AddListener(onClick);
+            isActive = true;
+
+            if (tooltip != null)
+            {
+                tooltip.SetText(GetTooltipText(command));
+            }
+        }
+        
     }
 }

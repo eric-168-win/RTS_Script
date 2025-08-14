@@ -203,7 +203,8 @@ namespace RTS_LEARN.Player
             }
 
             Bounds selectionBounds = ResizeSelectionBox();
-            foreach (AbstractUnit unit in aliveUnits)
+            // foreach (AbstractUnit unit in aliveUnits)
+            foreach (AbstractUnit unit in aliveUnits.Where(aliveUnits => aliveUnits.gameObject.activeInHierarchy))
             {
                 Vector2 unitPosition = camera.WorldToScreenPoint(unit.transform.position);
                 //WorldToScreenPoint converts world position to screen position
