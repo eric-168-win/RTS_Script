@@ -12,19 +12,23 @@ namespace RTS_LEARN.Commands
 
         public override bool CanHandle(CommandContext context)
         {
-            return context.Commandable is BaseBuilding && HasEnoughSupplies();
+            return context.Commandable is BaseBuilding && HasEnoughSupplies(context);
         }
 
         public override void Handle(CommandContext context)
         {
-            if (!HasEnoughSupplies()) return;
+            if (!HasEnoughSupplies(context)) return;
 
             BaseBuilding building = (BaseBuilding)context.Commandable;
             building.BuildUnit(Unit);
         }
 
-        public override bool IsLocked(CommandContext context) => !HasEnoughSupplies();
+        public override bool IsLocked(CommandContext context) => !HasEnoughSupplies(context);
 
-        private bool HasEnoughSupplies() => Unit.Cost.Minerals <= Supplies.Minerals && Unit.Cost.Gas <= Supplies.Gas;
+        private bool HasEnoughSupplies(CommandContext context)
+        {
+            return Unit.Cost.Minerals <= Supplies.Minerals[context.Owner] && Unit.Cost.Gas <= Supplies.Gas[context.Owner];
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 using RTS_LEARN.EventBus;
+using RTS_LEARN.Units;
 using UnityEngine;
 
 namespace RTS_LEARN.Event
@@ -8,12 +9,14 @@ namespace RTS_LEARN.Event
         // public GameObject Self { get; }
         public int Amount { get; }
         public SupplySO Supply { get; }
+        public Owner Owner { get; private set; }
 
-        public SupplyEvent(int amount, SupplySO supply)
+        public SupplyEvent(Owner owner, int amount, SupplySO supply)
         {
-            // Self = self;
             Amount = amount;
             Supply = supply;
+            Owner = owner;
         }
+
     }
 }

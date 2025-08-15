@@ -29,7 +29,7 @@ namespace RTS_LEARN.UI.Containers
                 buildingUnderConstructionUI.EnableFor(building);
                 buildingBuildingUI.Disable();
                 singleUnitSelectedUI.Disable();
-                // Bus<BuildingSpawnEvent>.OnEvent += HandleBuildingSpawn;
+                Bus<BuildingSpawnEvent>.OnEvent[Owner.Player1] += HandleBuildingSpawn;
             }
         }
 
@@ -38,7 +38,7 @@ namespace RTS_LEARN.UI.Containers
             buildingBuildingUI.Disable();
             singleUnitSelectedUI.Disable();
             buildingUnderConstructionUI.Disable();
-            // Bus<BuildingSpawnEvent>.OnEvent -= HandleBuildingSpawn;
+            Bus<BuildingSpawnEvent>.OnEvent[Owner.Player1] -= HandleBuildingSpawn;
 
             if (selectedBuilding != null)
             {
@@ -66,7 +66,7 @@ namespace RTS_LEARN.UI.Containers
         {
             if (selectedBuilding == evt.Building)
             {
-                // selectedBuilding.OnQueueUpdated -= OnBuildingQueueUpdated;
+                Bus<BuildingSpawnEvent>.OnEvent[Owner.Player1] -= HandleBuildingSpawn;
                 OnBuildingQueueUpdated();
                 buildingUnderConstructionUI.Disable();
             }

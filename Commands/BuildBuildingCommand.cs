@@ -24,7 +24,7 @@ namespace RTS_LEARN.Commands
                     );
             }
 
-            return HasEnoughSupplies() && AllRestrictionsPass(context.Hit.point);
+            return HasEnoughSupplies(context) && AllRestrictionsPass(context.Hit.point);
         }
 
         public override void Handle(CommandContext context)
@@ -34,17 +34,20 @@ namespace RTS_LEARN.Commands
             {
                 builder.ResumeBuilding(building);
             }
-            else if (HasEnoughSupplies() && AllRestrictionsPass(context.Hit.point) && context.Button.ToString() != "Right")
+            else if (HasEnoughSupplies(context) && AllRestrictionsPass(context.Hit.point) && context.Button.ToString() != "Right")
             {
                 Debug.Log($"Building {BuildingSO.name} at {context.Hit.point}:::: {context.Button}");
                 builder.Build(BuildingSO, context.Hit.point);
             }
         }
 
-        public override bool IsLocked(CommandContext context) => !HasEnoughSupplies();
+        public override bool IsLocked(CommandContext context) => !HasEnoughSupplies(context);
 
-        private bool HasEnoughSupplies() => BuildingSO.Cost.Minerals <= Supplies.Minerals && BuildingSO.Cost.Gas <= Supplies.Gas;
-
+        private bool HasEnoughSupplies(CommandContext context)
+        {
+            return BuildingSO.Cost.Minerals <= Supplies.Minerals[context.Owner]
+                && BuildingSO.Cost.Gas <= Supplies.Gas[context.Owner];
+        }
 
     }
 }

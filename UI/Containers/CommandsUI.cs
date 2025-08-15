@@ -39,7 +39,10 @@ namespace RTS_LEARN.UI.Containers
 
         private void RefreshButtons(HashSet<AbstractCommandable> selectedUnits)
         {
-            IEnumerable<BaseCommand> availableCommands = selectedUnits.ElementAt(0).AvailableCommands;//[0] doesn't matter
+            IEnumerable<BaseCommand> availableCommands = selectedUnits.Count > 0
+                ? selectedUnits.ElementAt(0).AvailableCommands //[0] doesn't matter
+                : Array.Empty<BaseCommand>();
+            
 
             for (int i = 1; i < selectedUnits.Count; i++)
             {
@@ -65,9 +68,9 @@ namespace RTS_LEARN.UI.Containers
             }
         }
 
-        private UnityAction HandleClick(BaseCommand Action)
+        private UnityAction HandleClick(BaseCommand action)
         {
-            return null;
+            return () => Bus<CommandSelectedEvent>.Raise(Owner.Player1, new CommandSelectedEvent(action));
             // return () => Bus<CommandSelectedEvent>.Raise(new CommandSelectedEvent(Action));
         }
 

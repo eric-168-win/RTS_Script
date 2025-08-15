@@ -72,12 +72,20 @@ namespace RTS_LEARN.Player
 
             maxRotationAmount = Mathf.Abs(cinemachineFollow.FollowOffset.z);
 
-            // Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
-            // Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
-            // Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
-            // Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
-            // Bus<CommandSelectedEvent>.OnEvent += HandleCommandSelected;
+            Bus<UnitSelectedEvent>.OnEvent[Owner.Player1] += HandleUnitSelected;
+            Bus<UnitDeselectedEvent>.OnEvent[Owner.Player1] += HandleUnitDeselected;
+            Bus<UnitSpawnEvent>.OnEvent[Owner.Player1] += HandleUnitSpawned;
+            Bus<UnitDeathEvent>.OnEvent[Owner.Player1] += HandleUnitDeath;
+            Bus<CommandSelectedEvent>.OnEvent[Owner.Player1] += HandleCommandSelected;
+        }
 
+        private void OnDestroy()
+        {
+            Bus<UnitSelectedEvent>.OnEvent[Owner.Player1] -= HandleUnitSelected;
+            Bus<UnitDeselectedEvent>.OnEvent[Owner.Player1] -= HandleUnitDeselected;
+            Bus<UnitSpawnEvent>.OnEvent[Owner.Player1] -= HandleUnitSpawned;
+            Bus<CommandSelectedEvent>.OnEvent[Owner.Player1] -= HandleCommandSelected;
+            Bus<UnitDeathEvent>.OnEvent[Owner.Player1] -= HandleUnitDeath;
         }
 
         private void HandleUnitDeath(UnitDeathEvent evt)
@@ -85,7 +93,6 @@ namespace RTS_LEARN.Player
             aliveUnits.Remove(evt.Unit);
             selectedUnits.Remove(evt.Unit);
         }
-
 
         private void HandleUnitSpawned(UnitSpawnEvent evt) => aliveUnits.Add(evt.Unit);
         private void HandleUnitSelected(UnitSelectedEvent evt)
@@ -110,16 +117,6 @@ namespace RTS_LEARN.Player
                 ghostInstance.name = "moving_Instance";
                 ghostRenderer = ghostInstance.GetComponentInChildren<MeshRenderer>();
             }
-        }
-
-
-        private void OnDestroy()
-        {   
-            // Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
-            // Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
-            // Bus<UnitSpawnEvent>.OnEvent -= HandleUnitSpawned;
-            // Bus<CommandSelectedEvent>.OnEvent -= HandleCommandSelected;
-            // Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
         }
 
         void Update()
@@ -277,6 +274,7 @@ namespace RTS_LEARN.Player
 
         private void HandleRightClick()
         {
+            // Debug.Log("selectedUnits:::" + selectedUnits.Count);
             if (selectedUnits.Count == 0) { return; }
 
             if (Mouse.current.rightButton.wasReleasedThisFrame)
