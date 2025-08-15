@@ -21,12 +21,12 @@ namespace RTS_LEARN.Player
 
         private void Awake()
         {
-            Bus<SupplyEvent>.OnEvent += HandleSupplyEvent;
+            // Bus<SupplyEvent>.OnEvent += HandleSupplyEvent;
         }
 
         private void OnDestroy()
         {
-            Bus<SupplyEvent>.OnEvent -= HandleSupplyEvent;
+            // Bus<SupplyEvent>.OnEvent -= HandleSupplyEvent;
         }
 
         private void HandleSupplyEvent(SupplyEvent evt)

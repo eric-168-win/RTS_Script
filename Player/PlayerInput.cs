@@ -72,11 +72,11 @@ namespace RTS_LEARN.Player
 
             maxRotationAmount = Mathf.Abs(cinemachineFollow.FollowOffset.z);
 
-            Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
-            Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
-            Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
-            Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
-            Bus<CommandSelectedEvent>.OnEvent += HandleCommandSelected;
+            // Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
+            // Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
+            // Bus<UnitSpawnEvent>.OnEvent += HandleUnitSpawned;
+            // Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
+            // Bus<CommandSelectedEvent>.OnEvent += HandleCommandSelected;
 
         }
 
@@ -114,13 +114,12 @@ namespace RTS_LEARN.Player
 
 
         private void OnDestroy()
-        {   //subscribe to events
-            Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
-            Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
-            Bus<UnitSpawnEvent>.OnEvent -= HandleUnitSpawned;
-            Bus<CommandSelectedEvent>.OnEvent -= HandleCommandSelected;
-            Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
-
+        {   
+            // Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
+            // Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
+            // Bus<UnitSpawnEvent>.OnEvent -= HandleUnitSpawned;
+            // Bus<CommandSelectedEvent>.OnEvent -= HandleCommandSelected;
+            // Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
         }
 
         void Update()

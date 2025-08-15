@@ -40,7 +40,7 @@ namespace RTS_LEARN.Units
                 decalProjector.gameObject.SetActive(true);
             }
             IsSelected = true;
-            Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
+            // Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
         }
 
         public virtual void Deselect()
@@ -51,7 +51,7 @@ namespace RTS_LEARN.Units
             }
             IsSelected = false;
             SetCommandOverrides(null);
-            Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this));
+            // Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this));
         }
 
         public void SetCommandOverrides(BaseCommand[] commands)
@@ -67,7 +67,7 @@ namespace RTS_LEARN.Units
 
             if (IsSelected)
             {
-                Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
+                // Bus<UnitSelectedEvent>.Raise(new UnitSelectedEvent(this));
             }
         }
 

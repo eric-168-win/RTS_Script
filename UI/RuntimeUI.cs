@@ -22,12 +22,12 @@ namespace RTS_LEARN.UI
 
         void Awake()
         {
-            Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
-            Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
-            Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
-            Bus<SupplyEvent>.OnEvent += HandleSupplyChange;
-            Bus<UnitLoadEvent>.OnEvent += HandleLoadUnit;
-            Bus<UnitUnloadEvent>.OnEvent += HandleUnloadUnit;
+            // Bus<UnitSelectedEvent>.OnEvent += HandleUnitSelected;
+            // Bus<UnitDeselectedEvent>.OnEvent += HandleUnitDeselected;
+            // Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
+            // Bus<SupplyEvent>.OnEvent += HandleSupplyChange;
+            // Bus<UnitLoadEvent>.OnEvent += HandleLoadUnit;
+            // Bus<UnitUnloadEvent>.OnEvent += HandleUnloadUnit;
 
         }
 
@@ -42,12 +42,12 @@ namespace RTS_LEARN.UI
 
         void OnDestroy()
         {
-            Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
-            Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
-            Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
-            Bus<SupplyEvent>.OnEvent -= HandleSupplyChange;
-            Bus<UnitLoadEvent>.OnEvent -= HandleLoadUnit;
-            Bus<UnitUnloadEvent>.OnEvent -= HandleUnloadUnit;
+            // Bus<UnitSelectedEvent>.OnEvent -= HandleUnitSelected;
+            // Bus<UnitDeselectedEvent>.OnEvent -= HandleUnitDeselected;
+            // Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+            // Bus<SupplyEvent>.OnEvent -= HandleSupplyChange;
+            // Bus<UnitLoadEvent>.OnEvent -= HandleLoadUnit;
+            // Bus<UnitUnloadEvent>.OnEvent -= HandleUnloadUnit;
         }
 
         private void HandleLoadUnit(UnitLoadEvent evt)

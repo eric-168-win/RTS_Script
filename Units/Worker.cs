@@ -71,7 +71,7 @@ namespace RTS_LEARN.Units
 
         private void HandleGatherSupplies(GameObject self, int amount, SupplySO supply)
         {
-            Bus<SupplyEvent>.Raise(new SupplyEvent(amount, supply));
+            Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(amount, supply));
         }
 
         public void LoadInto(ITransporter transporter)
@@ -104,8 +104,8 @@ namespace RTS_LEARN.Units
             graphAgent.SetVariableValue("Command", UnitCommands.BuildBuilding);
 
             SetCommandOverrides(new BaseCommand[] { CancelBuildingCommand });
-            Bus<SupplyEvent>.Raise(new SupplyEvent(-building.Cost.Minerals, building.Cost.MineralsSO));
-            Bus<SupplyEvent>.Raise(new SupplyEvent(-building.Cost.Gas, building.Cost.GasSO));
+            Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(-building.Cost.Minerals, building.Cost.MineralsSO));
+            Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(-building.Cost.Gas, building.Cost.GasSO));
 
             return instance;
         }
@@ -137,8 +137,8 @@ namespace RTS_LEARN.Units
                 && buildingVariable.Value != null)
             {
                 AbstractUnitSO unitSO = buildingVariable.Value.BuildingSO;
-                Bus<SupplyEvent>.Raise(new SupplyEvent(unitSO.Cost.Minerals, unitSO.Cost.MineralsSO));
-                Bus<SupplyEvent>.Raise(new SupplyEvent(unitSO.Cost.Gas, unitSO.Cost.GasSO));
+                Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(unitSO.Cost.Minerals, unitSO.Cost.MineralsSO));
+                Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(unitSO.Cost.Gas, unitSO.Cost.GasSO));
                 Destroy(buildingVariable.Value.gameObject);//must add gameObject Not Just BaseBuilding
             }
 
@@ -159,7 +159,7 @@ namespace RTS_LEARN.Units
                 SetCommandOverrides(null);
             }
 
-            Bus<UnitDeselectedEvent>.Raise(new UnitDeselectedEvent(this));
+            Bus<UnitDeselectedEvent>.Raise(Owner, new UnitDeselectedEvent(this));
         }
     }
 }

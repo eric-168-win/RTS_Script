@@ -36,7 +36,7 @@ namespace RTS_LEARN.Units
             base.Start();
             CurrentHealth = UnitSO.Health;
             MaxHealth = UnitSO.Health;
-            Bus<UnitSpawnEvent>.Raise(new UnitSpawnEvent(this));
+            Bus<UnitSpawnEvent>.Raise(Owner, new UnitSpawnEvent(this));
 
             if (DamageableSensor != null)
             {
@@ -129,7 +129,7 @@ namespace RTS_LEARN.Units
 
         protected virtual void OnDestroy()
         {
-            Bus<UnitDeathEvent>.Raise(new UnitDeathEvent(this));
+            Bus<UnitDeathEvent>.Raise(Owner, new UnitDeathEvent(this));
         }
     }
 }

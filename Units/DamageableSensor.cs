@@ -37,7 +37,7 @@ namespace RTS_LEARN.Units
             // Debug.Log("damageables.Count::" + damageables.Count);
             if (damageables.Count == 1)
             {
-                Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
+                Bus<UnitDeathEvent>.RegisterForAll(HandleUnitDeath);
             }
 
         }
@@ -51,13 +51,13 @@ namespace RTS_LEARN.Units
 
             if (damageables.Count == 0)
             {
-                Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+                Bus<UnitDeathEvent>.UnregisterForAll(HandleUnitDeath);
             }
         }
 
         private void OnDestroy()
         {
-            Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+            Bus<UnitDeathEvent>.UnregisterForAll(HandleUnitDeath);
         }
 
         private void HandleUnitDeath(UnitDeathEvent evt)

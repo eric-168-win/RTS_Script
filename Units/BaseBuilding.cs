@@ -50,8 +50,8 @@ namespace RTS_LEARN.Units
             }
             Progress = new BuildingProgress(BuildingProgress.BuildingState.Completed, Progress.StartTime, 1);
             unitBuildingThis = null;
-            Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
-            Bus<BuildingSpawnEvent>.Raise(new BuildingSpawnEvent(this));
+            Bus<UnitDeathEvent>.OnEvent[Owner] -= HandleUnitDeath;
+            Bus<BuildingSpawnEvent>.Raise(Owner, new BuildingSpawnEvent(this));
         }
 
         public void BuildUnit(AbstractUnitSO unit)
@@ -60,8 +60,8 @@ namespace RTS_LEARN.Units
             {
                 return;
             }
-            Bus<SupplyEvent>.Raise(new SupplyEvent(-unit.Cost.Minerals, unit.Cost.MineralsSO));
-            Bus<SupplyEvent>.Raise(new SupplyEvent(-unit.Cost.Gas, unit.Cost.GasSO));
+            Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(-unit.Cost.Minerals, unit.Cost.MineralsSO));
+            Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(-unit.Cost.Gas, unit.Cost.GasSO));
 
 
             buildingQueue.Add(unit);
@@ -81,8 +81,8 @@ namespace RTS_LEARN.Units
             if (index < 0 || index >= buildingQueue.Count) return;
 
             AbstractUnitSO unitSO = buildingQueue[index];
-            Bus<SupplyEvent>.Raise(new SupplyEvent(unitSO.Cost.Minerals, unitSO.Cost.MineralsSO));
-            Bus<SupplyEvent>.Raise(new SupplyEvent(unitSO.Cost.Gas, unitSO.Cost.GasSO));
+            Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(unitSO.Cost.Minerals, unitSO.Cost.MineralsSO));
+            Bus<SupplyEvent>.Raise(Owner, new SupplyEvent(unitSO.Cost.Gas, unitSO.Cost.GasSO));
             buildingQueue.RemoveAt(index);
             if (index == 0)
             {
@@ -122,8 +122,8 @@ namespace RTS_LEARN.Units
             }
 
             //don't want to have duplicate event handlers
-            Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
-            Bus<UnitDeathEvent>.OnEvent += HandleUnitDeath;
+            Bus<UnitDeathEvent>.OnEvent[Owner] -= HandleUnitDeath;
+            Bus<UnitDeathEvent>.OnEvent[Owner] += HandleUnitDeath;
         }
 
         private void HandleUnitDeath(UnitDeathEvent evt)
@@ -136,13 +136,13 @@ namespace RTS_LEARN.Units
                     (Time.time - Progress.StartTime) / BuildingSO.BuildTime
                 );
 
-                Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+                Bus<UnitDeathEvent>.OnEvent[Owner] -= HandleUnitDeath;
             }
         }
 
         private void OnDestroy()
         {
-            Bus<UnitDeathEvent>.OnEvent -= HandleUnitDeath;
+            Bus<UnitDeathEvent>.OnEvent[Owner] -= HandleUnitDeath;
         }
 
 

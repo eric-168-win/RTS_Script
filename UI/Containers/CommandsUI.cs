@@ -67,7 +67,8 @@ namespace RTS_LEARN.UI.Containers
 
         private UnityAction HandleClick(BaseCommand Action)
         {
-            return () => Bus<CommandSelectedEvent>.Raise(new CommandSelectedEvent(Action));
+            return null;
+            // return () => Bus<CommandSelectedEvent>.Raise(new CommandSelectedEvent(Action));
         }
 
     }
