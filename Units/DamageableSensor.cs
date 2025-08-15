@@ -27,9 +27,8 @@ namespace RTS_LEARN.Units
 
         private void OnTriggerEnter(Collider collider)
         {
-            if (collider.TryGetComponent(out IDamageable damageable)
-                && damageable.Owner != Owner
-                && !collider.gameObject.name.StartsWith("buggy"))
+            if (collider.TryGetComponent(out IDamageable damageable) && damageable.Owner != Owner
+                    && !collider.gameObject.name.StartsWith("buggy"))
             {
                 damageables.Add(damageable);
                 OnUnitEnter?.Invoke(damageable);
@@ -44,7 +43,7 @@ namespace RTS_LEARN.Units
 
         private void OnTriggerExit(Collider collider)
         {
-            if (collider.TryGetComponent(out IDamageable damageable) && damageables.Remove(damageable))
+            if (collider.TryGetComponent(out IDamageable damageable) && damageables.Remove(damageable) /*remove from hashset suesfuly*/)
             {
                 OnUnitExit?.Invoke(damageable);
             }

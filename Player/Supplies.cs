@@ -32,8 +32,8 @@ namespace RTS_LEARN.Player
 
             foreach (Owner owner in Enum.GetValues(typeof(Owner)))
             {
-                Minerals.Add(owner, 0);
-                Gas.Add(owner, 0);
+                Minerals.Add(owner, 5000);
+                Gas.Add(owner, 5000);
                 Population.Add(owner, 0);
                 PopulationLimit.Add(owner, 0);
             }
