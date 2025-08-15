@@ -6,10 +6,12 @@ namespace RTS_LEARN.Event
     public struct BuildingSpawnEvent : IEvent
     {
         public BaseBuilding Building { get; private set; }
-
-        public BuildingSpawnEvent(BaseBuilding building)
+        public Owner Owner { get; private set; }
+        public BuildingSpawnEvent(Owner owner, BaseBuilding building)
         {
             Building = building;
+            Owner = owner;
         }
+
     }
 }

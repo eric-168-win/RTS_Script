@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RTS_LEARN.Event;
+using RTS_LEARN.EventBus;
 using RTS_LEARN.Units;
 using UnityEngine;
 
@@ -17,14 +19,24 @@ namespace RTS_LEARN.TechTree
         private void OnEnable()
         {
             if (techTrees == null)
-            {
+            { 
                 BuildTechTrees();
             }
+            Bus<BuildingSpawnEvent>.RegisterForAll(HandleBuildingSpawn);
         }
 
         private void OnDisable()
         {
             techTrees = null;
+            Bus<BuildingSpawnEvent>.UnregisterForAll(HandleBuildingSpawn);
+        }
+
+        private void HandleBuildingSpawn(BuildingSpawnEvent evt)
+        {
+            foreach (KeyValuePair<UnlockableSO, Dependency> keyValuePair in techTrees[evt.Owner])
+            {
+                keyValuePair.Value.UnlockDependency(evt.Building.BuildingSO);
+            }
         }
 
         private void BuildTechTrees()
@@ -44,15 +56,33 @@ namespace RTS_LEARN.TechTree
                 }
             }
         }
-
+        private readonly Dictionary<UnlockableSO, int> metDependencies;
         private readonly struct Dependency
         {
             public HashSet<UnlockableSO> Dependencies { get; }
+            private readonly Dictionary<UnlockableSO, int> metDependencies;
 
             public Dependency(UnlockableSO unlockable)
             {
                 Dependencies = new HashSet<UnlockableSO>(unlockable.UnlockRequirements);
+                metDependencies = new Dictionary<UnlockableSO, int>(Dependencies.Count);
             }
+
+            public void UnlockDependency(UnlockableSO dependency)
+            {
+                Debug.Log($"Attempting to unlock dependency {dependency.Name}");
+
+                if (Dependencies.Contains(dependency) && !metDependencies.TryAdd(dependency, 1))
+                {
+                    metDependencies[dependency]++;
+                }
+
+                if (metDependencies.ContainsKey(dependency))
+                {
+                    Debug.Log($"Met dependencies for {dependency.Name}: {metDependencies[dependency]}");
+                }
+            }
+
         }
     }
 }
