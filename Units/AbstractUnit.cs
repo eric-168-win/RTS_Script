@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
+using RTS_LEARN.TechTree;
 using RTS_LEARN.Utilities;
 using Unity.Behavior;
 using UnityEngine;
@@ -44,6 +45,12 @@ namespace RTS_LEARN.Units
                 DamageableSensor.OnUnitExit += HandleUnitExit;
                 DamageableSensor.Owner = Owner;
                 DamageableSensor.SetupFrom(unitSO.AttackConfig);
+            }
+
+            foreach (UpgradeSO upgrade in unitSO.Upgrades)
+            {
+                // we still need to check that it's researched! Coming in a future lecture!
+                upgrade.Apply(unitSO);
             }
 
         }
