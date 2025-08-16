@@ -1,5 +1,6 @@
 using System.Linq;
 using RTS_LEARN.Player;
+using RTS_LEARN.TechTree;
 using RTS_LEARN.Units;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -9,6 +10,7 @@ namespace RTS_LEARN.Commands
     [CreateAssetMenu(fileName = "Build Building", menuName = "Units/Commands/Build Building")]
     public class BuildBuildingCommand : BaseCommand
     {
+        [SerializeField] private TechTreeSO techTree;
         [field: SerializeField] public BuildingSO BuildingSO { get; private set; }
 
         public override bool CanHandle(CommandContext context)
@@ -41,7 +43,8 @@ namespace RTS_LEARN.Commands
             }
         }
 
-        public override bool IsLocked(CommandContext context) => !HasEnoughSupplies(context);
+        public override bool IsLocked(CommandContext context) =>
+             !HasEnoughSupplies(context) || !techTree.IsUnlocked(context.Owner, BuildingSO);
 
         private bool HasEnoughSupplies(CommandContext context)
         {

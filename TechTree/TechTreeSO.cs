@@ -15,11 +15,13 @@ namespace RTS_LEARN.TechTree
         public IEnumerable<UnlockableSO> AllUnlockables => allUnlockables.ToList();
 
         private Dictionary<Owner, Dictionary<UnlockableSO, Dependency>> techTrees;
+        public bool IsUnlocked(Owner owner, UnlockableSO unlockable) =>
+            techTrees[owner].TryGetValue(unlockable, out Dependency value) && value.IsUnlocked;
 
         private void OnEnable()
         {
             if (techTrees == null)
-            { 
+            {
                 BuildTechTrees();
             }
             Bus<BuildingSpawnEvent>.RegisterForAll(HandleBuildingSpawn);
@@ -60,6 +62,7 @@ namespace RTS_LEARN.TechTree
         private readonly struct Dependency
         {
             public HashSet<UnlockableSO> Dependencies { get; }
+            public bool IsUnlocked => Dependencies.Count == metDependencies.Count;
             private readonly Dictionary<UnlockableSO, int> metDependencies;
 
             public Dependency(UnlockableSO unlockable)
@@ -70,19 +73,11 @@ namespace RTS_LEARN.TechTree
 
             public void UnlockDependency(UnlockableSO dependency)
             {
-                Debug.Log($"Attempting to unlock dependency {dependency.Name}");
-
                 if (Dependencies.Contains(dependency) && !metDependencies.TryAdd(dependency, 1))
                 {
                     metDependencies[dependency]++;
                 }
-
-                if (metDependencies.ContainsKey(dependency))
-                {
-                    Debug.Log($"Met dependencies for {dependency.Name}: {metDependencies[dependency]}");
-                }
             }
-
         }
     }
 }
