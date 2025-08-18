@@ -28,6 +28,8 @@ namespace RTS_LEARN.UI
             Bus<SupplyEvent>.OnEvent[Owner.Player1] += HandleSupplyChange;
             Bus<UnitLoadEvent>.OnEvent[Owner.Player1] += HandleLoadUnit;
             Bus<UnitUnloadEvent>.OnEvent[Owner.Player1] += HandleUnloadUnit;
+            Bus<BuildingSpawnEvent>.OnEvent[Owner.Player1] += HandleBuildingSpawn;
+            Bus<UpgradeResearchedEvent>.OnEvent[Owner.Player1] += HandleUpgradeResearched;
         }
 
         void Start()
@@ -47,7 +49,23 @@ namespace RTS_LEARN.UI
             Bus<SupplyEvent>.OnEvent[Owner.Player1] -= HandleSupplyChange;
             Bus<UnitLoadEvent>.OnEvent[Owner.Player1] -= HandleLoadUnit;
             Bus<UnitUnloadEvent>.OnEvent[Owner.Player1] -= HandleUnloadUnit;
+            Bus<BuildingSpawnEvent>.OnEvent[Owner.Player1] -= HandleBuildingSpawn;
+            Bus<UpgradeResearchedEvent>.OnEvent[Owner.Player1] -= HandleUpgradeResearched;
         }
+
+        private void HandleUpgradeResearched(UpgradeResearchedEvent args)
+        {
+            RefreshUI();
+        }
+
+        private void HandleBuildingSpawn(BuildingSpawnEvent args)
+        {
+            if (selectedUnits.Count == 1 && selectedUnits.First() is Worker)
+            {
+                commandsUI.EnableFor(selectedUnits);
+            }
+        }
+
 
         private void HandleLoadUnit(UnitLoadEvent evt)
         {
