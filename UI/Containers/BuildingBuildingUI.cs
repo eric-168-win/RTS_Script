@@ -1,4 +1,5 @@
 using System.Collections;
+using RTS_LEARN.TechTree;
 using RTS_LEARN.UI.Components;
 using RTS_LEARN.Units;
 using UnityEngine;
@@ -40,7 +41,7 @@ namespace RTS_LEARN.UI.Containers
             }
         }
 
-        private void HandleQueueUpdated(AbstractUnitSO[] unitsInQueue)
+        private void HandleQueueUpdated(UnlockableSO[] unitsInQueue)
         {
             if (unitsInQueue.Length == 1 & buildCoroutine == null)
             {
@@ -70,7 +71,7 @@ namespace RTS_LEARN.UI.Containers
             while (building != null && building.QueueSize > 0)
             {
                 float startTime = building.CurrentQueueStartTime;
-                float endTime = startTime + building.BuildingUnit.BuildTime;
+                float endTime = startTime + building.SOBeingBuilt.BuildTime;
 
                 float progress = Mathf.Clamp01((Time.time - startTime) / (endTime - startTime));
 

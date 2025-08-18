@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
+using RTS_LEARN.Events;
 using RTS_LEARN.Units;
 using UnityEngine;
 
@@ -15,8 +16,12 @@ namespace RTS_LEARN.TechTree
         public IEnumerable<UnlockableSO> AllUnlockables => allUnlockables.ToList();
 
         private Dictionary<Owner, Dictionary<UnlockableSO, Dependency>> techTrees;
+        private Dictionary<Owner, HashSet<UnlockableSO>> unlockedDependencies;
+
         public bool IsUnlocked(Owner owner, UnlockableSO unlockable) =>
             techTrees[owner].TryGetValue(unlockable, out Dependency value) && value.IsUnlocked;
+        public bool IsResearched(Owner owner, UnlockableSO unlockable) =>
+            unlockedDependencies[owner].Contains(unlockable);
 
         private void OnEnable()
         {
@@ -25,12 +30,26 @@ namespace RTS_LEARN.TechTree
                 BuildTechTrees();
             }
             Bus<BuildingSpawnEvent>.RegisterForAll(HandleBuildingSpawn);
+            Bus<UpgradeResearchedEvent>.RegisterForAll(HandleUpgradeResearched);
+        }
+
+        private void HandleUpgradeResearched(UpgradeResearchedEvent evt)
+        {
+            Debug.Log($"Researched {evt.Upgrade.Name} for {evt.Owner}!");
+            unlockedDependencies[evt.Owner].Add(evt.Upgrade);
+
+            foreach (KeyValuePair<UnlockableSO, Dependency> keyValuePair in techTrees[evt.Owner])
+            {
+                keyValuePair.Value.UnlockDependency(evt.Upgrade);
+            }
+
         }
 
         private void OnDisable()
         {
             techTrees = null;
             Bus<BuildingSpawnEvent>.UnregisterForAll(HandleBuildingSpawn);
+            Bus<UpgradeResearchedEvent>.UnregisterForAll(HandleUpgradeResearched);
         }
 
         private void HandleBuildingSpawn(BuildingSpawnEvent evt)
@@ -44,12 +63,16 @@ namespace RTS_LEARN.TechTree
         private void BuildTechTrees()
         {
             techTrees = new Dictionary<Owner, Dictionary<UnlockableSO, Dependency>>();
+            unlockedDependencies = new Dictionary<Owner, HashSet<UnlockableSO>>();
+
             Debug.Log($"Building Tech Tree {name}");
 
             foreach (Owner owner in Enum.GetValues(typeof(Owner)))
             {
                 Debug.Log($"Adding {owner} to Tech Trees Dictionary");
+                
                 techTrees.Add(owner, new Dictionary<UnlockableSO, Dependency>());
+                unlockedDependencies.Add(owner, new HashSet<UnlockableSO>());
 
                 foreach (UnlockableSO unlockableSO in allUnlockables)
                 {

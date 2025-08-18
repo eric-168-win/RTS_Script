@@ -1,5 +1,6 @@
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
+using RTS_LEARN.TechTree;
 using RTS_LEARN.Units;
 using UnityEngine;
 
@@ -47,7 +48,7 @@ namespace RTS_LEARN.UI.Containers
             }
         }
 
-        private void OnBuildingQueueUpdated(AbstractUnitSO[] _ = null)
+        private void OnBuildingQueueUpdated(UnlockableSO[] _ = null)
         {
             if (selectedBuilding.QueueSize == 0)
             {

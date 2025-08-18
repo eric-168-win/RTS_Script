@@ -10,7 +10,6 @@ namespace RTS_LEARN.Commands
     [CreateAssetMenu(fileName = "Build Building", menuName = "Units/Commands/Build Building")]
     public class BuildBuildingCommand : BaseCommand
     {
-        [SerializeField] private TechTreeSO techTree;
         [field: SerializeField] public BuildingSO BuildingSO { get; private set; }
 
         public override bool CanHandle(CommandContext context)
@@ -44,7 +43,8 @@ namespace RTS_LEARN.Commands
         }
 
         public override bool IsLocked(CommandContext context) =>
-             !HasEnoughSupplies(context) || !techTree.IsUnlocked(context.Owner, BuildingSO);
+            !HasEnoughSupplies(context) || !BuildingSO.TechTree.IsUnlocked(context.Owner, BuildingSO);
+
 
         private bool HasEnoughSupplies(CommandContext context)
         {
