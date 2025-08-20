@@ -20,12 +20,14 @@ namespace RTS_LEARN.Units
         [field: SerializeField] public BaseCommand[] AvailableCommands { get; private set; }
         [SerializeField] protected DecalProjector decalProjector;
         private BaseCommand[] initialCommands;
-
         [field: SerializeField] public AbstractUnitSO UnitSO { get; private set; }
-
-
         public delegate void HealthUpdatedEvent(AbstractCommandable commandable, int lastHealth, int newHealth);
         public event HealthUpdatedEvent OnHealthUpdated;
+
+        protected virtual void Awake()
+        {
+            UnitSO = UnitSO.Clone() as AbstractUnitSO;
+        }
 
         protected virtual void Start()
         {

@@ -34,9 +34,10 @@ namespace RTS_LEARN.Units
         private const int MAX_QUEUE_SIZE = 5;
         private IBuildingBuilder unitBuildingThis;
 
-
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             BuildingSO = UnitSO as BuildingSO;
             MaxHealth = BuildingSO.Health;
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using RTS_LEARN.Units;
@@ -5,7 +6,7 @@ using UnityEngine;
 
 namespace RTS_LEARN.TechTree
 {
-    public abstract class UnlockableSO : ScriptableObject
+    public abstract class UnlockableSO : ScriptableObject, ICloneable
     {
         [field: SerializeField] public string Name { get; private set; } = "Unit";
         [field: SerializeField] public bool IsOneTimeUnlock { get; private set; }
@@ -16,5 +17,25 @@ namespace RTS_LEARN.TechTree
         [field: SerializeField] protected List<UnlockableSO> unlockRequirements { get; private set; } = new();
 
         public IEnumerable<UnlockableSO> UnlockRequirements => unlockRequirements.ToList();
+
+        public virtual object Clone()
+        {
+            UnlockableSO copy = Instantiate(this);
+
+            copy.Cost = Cost == null ? null : Instantiate(Cost);
+
+            return copy;
+        }
+
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode();
+        }
+
+        public override bool Equals(object other)
+        {
+            return other is UnlockableSO unlockableSO && GetHashCode().Equals(unlockableSO.GetHashCode());
+        }
+
     }
 }
