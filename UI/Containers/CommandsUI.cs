@@ -4,6 +4,7 @@ using System.Linq;
 using RTS_LEARN.Commands;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
+using RTS_LEARN.TechTree;
 using RTS_LEARN.UI.Components;
 using RTS_LEARN.Units;
 using Unity.VisualScripting;
@@ -15,6 +16,8 @@ namespace RTS_LEARN.UI.Containers
     public class CommandsUI : MonoBehaviour, IUIElement<HashSet<AbstractCommandable>>
     {
         [SerializeField] private UICommandButton[] actionButtons;
+        private HashSet<BaseBuilding> selectedBuildings = new();
+
         private void Start()
         //wait for the UI to be ready
         {
@@ -27,6 +30,23 @@ namespace RTS_LEARN.UI.Containers
         public void EnableFor(HashSet<AbstractCommandable> selectedUnits)
         {
             RefreshButtons(selectedUnits);
+
+            foreach (BaseBuilding building in selectedBuildings)
+            {
+                building.OnQueueUpdated -= OnBuildingQueueUpdated;
+            }
+
+            selectedBuildings = Enumerable.ToHashSet(
+                    selectedUnits
+                        .Where(selectedUnit => selectedUnit is BaseBuilding)
+                        .Cast<BaseBuilding>()
+                    );
+
+            foreach (BaseBuilding building in selectedBuildings)
+            {
+                building.OnQueueUpdated += OnBuildingQueueUpdated;
+            }
+
         }
 
         public void Disable()
@@ -35,7 +55,20 @@ namespace RTS_LEARN.UI.Containers
             {
                 actionButton.Disable();
             }
+
+            foreach (BaseBuilding building in selectedBuildings)
+            {
+                building.OnQueueUpdated -= OnBuildingQueueUpdated;
+            }
+            selectedBuildings.Clear();
         }
+
+        private void OnBuildingQueueUpdated(UnlockableSO[] unitsInQueue)
+        {
+            RefreshButtons(Enumerable.ToHashSet(selectedBuildings.Cast<AbstractCommandable>()));
+            // RefreshButtons(selectedBuildings.Cast<AbstractCommandable>().ToHashSet());
+        }
+
 
         private void RefreshButtons(HashSet<AbstractCommandable> selectedUnits)
         {
