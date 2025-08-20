@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace RTS_LEARN.TechTree
 {
+    // "AttackConfig/Damage"
     public abstract class UpgradeSO : UnlockableSO, IModifier
     {
         [field: SerializeField] public string PropertyPath { get; private set; }

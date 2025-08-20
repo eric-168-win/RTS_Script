@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Windows.Input;
 using RTS_LEARN.Commands;
 using RTS_LEARN.Event;
 using RTS_LEARN.EventBus;
+using RTS_LEARN.Events;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 
@@ -30,6 +32,21 @@ namespace RTS_LEARN.Units
             //protected => child classes can see and run
             //virtual => child classes can override this method
             initialCommands = AvailableCommands;
+
+            Bus<UpgradeResearchedEvent>.OnEvent[Owner] += HandleUpgradeResearched;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            Bus<UpgradeResearchedEvent>.OnEvent[Owner] -= HandleUpgradeResearched;
+        }
+
+        private void HandleUpgradeResearched(UpgradeResearchedEvent evt)
+        {
+            if (evt.Owner == Owner && UnitSO.Upgrades.Contains(evt.Upgrade))
+            {
+                evt.Upgrade.Apply(UnitSO);
+            }
         }
 
 
