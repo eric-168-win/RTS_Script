@@ -1,14 +1,13 @@
-using System;
 using System.Reflection;
 using RTS_LEARN.Units;
 using UnityEngine;
 
 namespace RTS_LEARN.TechTree
 {
-    [CreateAssetMenu(fileName = "Additive Int Modifier", menuName = "Tech Tree/Modifiers/Additive Int Modifier", order = 160)]
-    public class AdditiveIntModifierSO : UpgradeSO
+    [CreateAssetMenu(fileName = "Additive Float Modifier", menuName = "Tech Tree/Modifiers/Additive Float Modifier", order = 161)]
+    public class AdditiveFloatModifierSO : UpgradeSO
     {
-        [field: SerializeField] public int Amount { get; private set; }
+        [field: SerializeField] public float Amount { get; private set; }
 
         public override void Apply(AbstractUnitSO unit)
         {
@@ -16,7 +15,7 @@ namespace RTS_LEARN.TechTree
 
             try
             {
-                int currentValue = GetPropertyValue<int>(unit, out object target, out PropertyInfo attributeField);
+                float currentValue = GetPropertyValue<float>(unit, out object target, out PropertyInfo attributeField);
                 Debug.Log($"Adding {Amount} to {PropertyPath}'s current value of {currentValue}");
                 currentValue += Amount;
                 attributeField.SetValue(target, currentValue);
@@ -24,7 +23,5 @@ namespace RTS_LEARN.TechTree
             }
             catch (InvalidPathSpecifiedException) { }
         }
-
-
     }
 }
