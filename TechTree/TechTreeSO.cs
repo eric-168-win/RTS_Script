@@ -31,6 +31,7 @@ namespace RTS_LEARN.TechTree
             }
             Bus<BuildingSpawnEvent>.RegisterForAll(HandleBuildingSpawn);
             Bus<UpgradeResearchedEvent>.RegisterForAll(HandleUpgradeResearched);
+            Bus<BuildingDeathEvent>.RegisterForAll(HandleBuildingDeath);
         }
 
         private void HandleUpgradeResearched(UpgradeResearchedEvent evt)
@@ -50,6 +51,7 @@ namespace RTS_LEARN.TechTree
             techTrees = null;
             Bus<BuildingSpawnEvent>.UnregisterForAll(HandleBuildingSpawn);
             Bus<UpgradeResearchedEvent>.UnregisterForAll(HandleUpgradeResearched);
+            Bus<BuildingDeathEvent>.UnregisterForAll(HandleBuildingDeath);
         }
 
         private void HandleBuildingSpawn(BuildingSpawnEvent evt)
@@ -70,7 +72,7 @@ namespace RTS_LEARN.TechTree
             foreach (Owner owner in Enum.GetValues(typeof(Owner)))
             {
                 Debug.Log($"Adding {owner} to Tech Trees Dictionary");
-                
+
                 techTrees.Add(owner, new Dictionary<UnlockableSO, Dependency>());
                 unlockedDependencies.Add(owner, new HashSet<UnlockableSO>());
 
@@ -80,8 +82,17 @@ namespace RTS_LEARN.TechTree
                     Debug.Log($"Configuring {unlockableSO}'s {unlockableSO.UnlockRequirements.Count()} dependencies");
                 }
             }
+
         }
-        private readonly Dictionary<UnlockableSO, int> metDependencies;
+
+        private void HandleBuildingDeath(BuildingDeathEvent evt)
+        {
+            foreach (KeyValuePair<UnlockableSO, Dependency> keyValuePair in techTrees[evt.Owner])
+            {
+                // keyValuePair.Value.LoseDependency(evt.Building.BuildingSO);
+            }
+        }
+
         private readonly struct Dependency
         {
             public HashSet<UnlockableSO> Dependencies { get; }
@@ -99,6 +110,22 @@ namespace RTS_LEARN.TechTree
                 if (Dependencies.Contains(dependency) && !metDependencies.TryAdd(dependency, 1))
                 {
                     metDependencies[dependency]++;
+                }
+            }
+
+            public void LoseDependency(UnlockableSO dependency)
+            {
+                if (dependency.IsOneTimeUnlock || !metDependencies.TryGetValue(dependency, out int count)) return;
+
+                count--;
+
+                if (count > 0)
+                {
+                    metDependencies[dependency] = count;
+                }
+                else
+                {
+                    metDependencies.Remove(dependency);
                 }
             }
         }

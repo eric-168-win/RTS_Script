@@ -30,6 +30,7 @@ namespace RTS_LEARN.UI
             Bus<UnitUnloadEvent>.OnEvent[Owner.Player1] += HandleUnloadUnit;
             Bus<BuildingSpawnEvent>.OnEvent[Owner.Player1] += HandleBuildingSpawn;
             Bus<UpgradeResearchedEvent>.OnEvent[Owner.Player1] += HandleUpgradeResearched;
+            Bus<BuildingDeathEvent>.OnEvent[Owner.Player1] += HandleBuildingDeath;
         }
 
         void Start()
@@ -51,6 +52,13 @@ namespace RTS_LEARN.UI
             Bus<UnitUnloadEvent>.OnEvent[Owner.Player1] -= HandleUnloadUnit;
             Bus<BuildingSpawnEvent>.OnEvent[Owner.Player1] -= HandleBuildingSpawn;
             Bus<UpgradeResearchedEvent>.OnEvent[Owner.Player1] -= HandleUpgradeResearched;
+            Bus<BuildingDeathEvent>.OnEvent[Owner.Player1] -= HandleBuildingDeath;
+        }
+
+        private void HandleBuildingDeath(BuildingDeathEvent evt)
+        {
+            selectedUnits.Remove(evt.Building);
+            RefreshUI();
         }
 
         private void HandleUpgradeResearched(UpgradeResearchedEvent args)
@@ -65,7 +73,6 @@ namespace RTS_LEARN.UI
                 commandsUI.EnableFor(selectedUnits);
             }
         }
-
 
         private void HandleLoadUnit(UnitLoadEvent evt)
         {
@@ -86,7 +93,6 @@ namespace RTS_LEARN.UI
                 RefreshUI();
             }
         }
-
 
         private void HandleSupplyChange(SupplyEvent evt)
         {
@@ -174,7 +180,6 @@ namespace RTS_LEARN.UI
                 singleUnitSelectedUI.EnableFor(commandable);
             }
         }
-
     }
 }
 

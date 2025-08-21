@@ -151,12 +151,6 @@ namespace RTS_LEARN.Units
             }
         }
 
-        private void OnDestroy()
-        {
-            Bus<UnitDeathEvent>.OnEvent[Owner] -= HandleUnitDeath;
-        }
-
-
         private IEnumerator DoBuildUnit()
         {
             while (buildingQueue.Count > 0)
@@ -185,9 +179,14 @@ namespace RTS_LEARN.Units
             }
             OnQueueUpdated?.Invoke(buildingQueue.ToArray());
         }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            Bus<UnitDeathEvent>.OnEvent[Owner] -= HandleUnitDeath;
+            Bus<BuildingDeathEvent>.Raise(Owner, new BuildingDeathEvent(Owner, this));
+        }
     }
-
-
 }
 
 
