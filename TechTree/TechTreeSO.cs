@@ -23,6 +23,17 @@ namespace RTS_LEARN.TechTree
         public bool IsResearched(Owner owner, UnlockableSO unlockable) =>
             unlockedDependencies[owner].Contains(unlockable);
 
+        public UnlockableSO[] GetUnmetDependencies(Owner owner, UnlockableSO unlockableSO)
+        {
+            if (techTrees[owner].TryGetValue(unlockableSO, out Dependency dependency))
+            {
+                return dependency.GetUnmetDependencies();
+            }
+
+            return Array.Empty<UnlockableSO>();
+        }
+
+
         private void OnEnable()
         {
             if (techTrees == null)
@@ -89,7 +100,7 @@ namespace RTS_LEARN.TechTree
         {
             foreach (KeyValuePair<UnlockableSO, Dependency> keyValuePair in techTrees[evt.Owner])
             {
-                // keyValuePair.Value.LoseDependency(evt.Building.BuildingSO);
+                keyValuePair.Value.LoseDependency(evt.Building.BuildingSO);
             }
         }
 
@@ -103,6 +114,12 @@ namespace RTS_LEARN.TechTree
             {
                 Dependencies = new HashSet<UnlockableSO>(unlockable.UnlockRequirements);
                 metDependencies = new Dictionary<UnlockableSO, int>(Dependencies.Count);
+            }
+
+            public UnlockableSO[] GetUnmetDependencies()
+            {
+                Dictionary<UnlockableSO, int> metDependencies = this.metDependencies;
+                return Dependencies.Where(dependency => !metDependencies.ContainsKey(dependency)).ToArray();
             }
 
             public void UnlockDependency(UnlockableSO dependency)

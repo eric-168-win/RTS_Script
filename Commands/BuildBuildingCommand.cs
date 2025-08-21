@@ -8,7 +8,7 @@ using UnityEngine;
 namespace RTS_LEARN.Commands
 {
     [CreateAssetMenu(fileName = "Build Building", menuName = "Units/Commands/Build Building")]
-    public class BuildBuildingCommand : BaseCommand
+    public class BuildBuildingCommand : BaseCommand, IUnlockableCommand
     {
         [field: SerializeField] public BuildingSO BuildingSO { get; private set; }
 
@@ -45,6 +45,10 @@ namespace RTS_LEARN.Commands
         public override bool IsLocked(CommandContext context) =>
             !HasEnoughSupplies(context) || !BuildingSO.TechTree.IsUnlocked(context.Owner, BuildingSO);
 
+        public UnlockableSO[] GetUnmetDependencies(Owner owner)
+        {
+            return BuildingSO.TechTree.GetUnmetDependencies(owner, BuildingSO);
+        }
 
         private bool HasEnoughSupplies(CommandContext context)
         {

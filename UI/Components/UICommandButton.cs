@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using RTS_LEARN.Commands;
+using RTS_LEARN.TechTree;
 using RTS_LEARN.Units;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,8 +23,13 @@ namespace RTS_LEARN.UI.Components
 
         private bool isActive;
         private RectTransform rectTransform;
-
         private Button button;
+
+        private static readonly string MINERALS_FORMAT = "{0} <color=#00ACFF>Minerals</color>. ";
+        private static readonly string GAS_FORMAT = "{0} <color=#3BEA60>Gas</color>. ";
+        private static readonly string DEPENDENCY_FORMAT_NO_COMMA = "<color=#AC0000>{0}</color>.";
+        private static readonly string DEPENDENCY_FORMAT_COMMA = "<color=#AC0000>{0}</color>, ";
+
 
         private void Awake()
         {
@@ -105,11 +111,30 @@ namespace RTS_LEARN.UI.Components
             {
                 if (supplyCost.Minerals > 0)
                 {
-                    tooltipText += $"{supplyCost.Minerals} Minerals.";
+                    tooltipText += string.Format(MINERALS_FORMAT, supplyCost.Minerals);
                 }
                 if (supplyCost.Gas > 0)
                 {
-                    tooltipText += $"{supplyCost.Gas} Gas.";
+                    tooltipText += string.Format(GAS_FORMAT, supplyCost.Gas);
+                }
+            }
+
+            if (command.IsLocked(new CommandContext(Owner.Player1, null, new RaycastHit()))
+                && command is IUnlockableCommand unlockableCommand)
+            {
+                UnlockableSO[] dependencies = unlockableCommand.GetUnmetDependencies(Owner.Player1);
+
+                if (dependencies.Length > 0)
+                {
+                    tooltipText += "\nRequires: ";
+                }
+
+                for (int i = 0; i < dependencies.Length; i++)
+                {
+                    tooltipText += i == dependencies.Length - 1
+                        ? string.Format(DEPENDENCY_FORMAT_NO_COMMA, dependencies[i].Name)
+                        : string.Format(DEPENDENCY_FORMAT_COMMA, dependencies[i].Name);
+
                 }
             }
 
@@ -129,6 +154,6 @@ namespace RTS_LEARN.UI.Components
                 tooltip.SetText(GetTooltipText(command));
             }
         }
-        
+
     }
 }

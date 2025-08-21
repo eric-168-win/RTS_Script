@@ -138,8 +138,9 @@ namespace RTS_LEARN.Units
             return nearbyEnemies;
         }
 
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             Bus<UnitDeathEvent>.Raise(Owner, new UnitDeathEvent(this));
         }
     }

@@ -19,7 +19,8 @@ namespace RTS_LEARN.UI.Components
         {
             this.text.SetText(text);
             Vector2 preferredSize = this.text.GetPreferredValues();
-            RectTransform.sizeDelta = new Vector2(preferredSize.x + 50, RectTransform.sizeDelta.y);
+            // RectTransform.sizeDelta = new Vector2(preferredSize.x + 50, RectTransform.sizeDelta.y);
+            RectTransform.sizeDelta = new Vector2(preferredSize.x + 50, preferredSize.y + 25);
         }
 
     }
